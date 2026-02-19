@@ -18,6 +18,8 @@ const API = `${BACKEND_URL}/api`;
 
 const HomePage = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   React.useEffect(() => {
     const handleScroll = () => {
