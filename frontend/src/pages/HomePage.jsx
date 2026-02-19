@@ -125,6 +125,8 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      <Header />
+      
       {/* Hero Section */}
       <section className="relative pt-12 pb-8 px-4">
         <div className="max-w-6xl mx-auto text-center">
