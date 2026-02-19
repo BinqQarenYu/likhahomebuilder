@@ -423,19 +423,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-4 border-t border-zinc-800">
-        <div className="max-w-4xl mx-auto text-center space-y-4">
-          <h3 className="text-xl font-bold text-red-500">PIRACY IS A CRIME</h3>
-          <p className="text-sm text-gray-400">
-            The sale of these projects may only be made through this website, registered in the name of LIKHA HOME BUILDERS. Any other site where you find this program is FAKE and against the law. Avoid counterfeiting and reject illegal or pirated content.
-          </p>
-          <p className="text-sm text-gray-500">
-            Copyright 2024 – LIKHA HOME BUILDERS ®
-          </p>
-          <p className="text-sm text-gray-500">All rights reserved.</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
