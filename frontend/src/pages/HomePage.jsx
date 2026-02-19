@@ -115,8 +115,12 @@ const HomePage = () => {
     },
   ];
 
-  const handlePurchase = () => {
-    alert('Purchase functionality - This would redirect to payment gateway');
+  const handlePurchase = async () => {
+    // For now, show alert - can be replaced with actual purchase flow later
+    toast({
+      title: 'Purchase Inquiry',
+      description: 'Please contact us or fill out the contact form to proceed with your purchase.',
+    });
   };
 
   return (
