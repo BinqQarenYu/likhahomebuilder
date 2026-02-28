@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Backend API Testing Suite for Likha Home Builders
-Tests all API endpoints at https://steel-house-project.preview.emergentagent.com/api
+Tests all API endpoints at https://steel-house-project.preview.likhatechbuilder.com/api
 """
 
 import requests
@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 
 # Base URL from frontend .env
-BASE_URL = "https://steel-house-project.preview.emergentagent.com/api"
+BASE_URL = "https://steel-house-project.preview.likhatechbuilder.com/api"
 
 # Test data
 TEST_CONTACT_DATA = {

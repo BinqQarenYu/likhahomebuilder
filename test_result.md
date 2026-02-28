@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the Likha Home Builders backend API at https://steel-house-project.preview.emergentagent.com/api including health check, contact form submission, newsletter subscription, and purchase inquiry endpoints."
+user_problem_statement: "Test the Likha Home Builders backend API at https://steel-house-project.preview.likhatechbuilder.com/api including health check, contact form submission, newsletter subscription, and purchase inquiry endpoints."
 
 frontend:
   - task: "Page Load & Structure"
