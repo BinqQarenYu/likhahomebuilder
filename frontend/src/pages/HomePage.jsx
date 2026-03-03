@@ -9,12 +9,8 @@ import {
 } from '../components/ui/accordion';
 import { Card, CardContent } from '../components/ui/card';
 import { useToast } from '../hooks/use-toast';
-import axios from 'axios';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
 
 const HomePage = () => {
   const [isScrolled, setIsScrolled] = useState(false);
