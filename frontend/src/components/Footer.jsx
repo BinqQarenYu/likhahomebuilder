@@ -96,13 +96,13 @@ const Footer = () => {
               Building your dream modular homes with quality, efficiency, and affordability.
             </p>
             <div className="flex gap-3">
-              <a href="#" className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center hover:bg-[#C4D600] transition-colors">
+              <a href="#" className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center hover:bg-[#C4D600] transition-colors" aria-label="Visit our Facebook page">
                 <Facebook className="w-4 h-4 text-white" />
               </a>
-              <a href="#" className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center hover:bg-[#C4D600] transition-colors">
+              <a href="#" className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center hover:bg-[#C4D600] transition-colors" aria-label="Visit our Instagram page">
                 <Instagram className="w-4 h-4 text-white" />
               </a>
-              <a href="#" className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center hover:bg-[#C4D600] transition-colors">
+              <a href="#" className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center hover:bg-[#C4D600] transition-colors" aria-label="Visit our Twitter page">
                 <Twitter className="w-4 h-4 text-white" />
               </a>
             </div>
