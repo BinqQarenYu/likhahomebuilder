@@ -34,10 +34,16 @@ api_router.include_router(purchase.router)
 # Include the router in the main app
 app.include_router(api_router)
 
+# Configure CORS - Get from environment variable or use defaults
+# In production, ALLOWED_ORIGINS should be set in the .env file
+# e.g., ALLOWED_ORIGINS=https://yourdomain.com
+allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000")
+allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",") if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )

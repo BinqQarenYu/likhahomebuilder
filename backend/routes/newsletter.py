@@ -1,8 +1,10 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from typing import List
 import logging
+from pymongo import ReturnDocument
 from models import NewsletterSubscriber, NewsletterSubscriberCreate
 from database import get_database
+from auth import verify_admin_token
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/newsletter", tags=["newsletter"])
@@ -16,39 +18,37 @@ async def subscribe_newsletter(subscriber_data: NewsletterSubscriberCreate):
     try:
         db = await get_database()
         
-        # Check if email already exists
-        existing = await db.newsletter_subscribers.find_one(
-            {"email": subscriber_data.email}
+        # Create subscriber object for potential insertion
+        new_subscriber = NewsletterSubscriber(**subscriber_data.dict())
+
+        # Atomically find and update or insert (upsert)
+        # If the subscriber exists, we ensure is_active is True
+        # If it doesn't exist, we insert the new_subscriber data
+        existing = await db.newsletter_subscribers.find_one_and_update(
+            {"email": subscriber_data.email},
+            {
+                "$setOnInsert": new_subscriber.dict(),
+                "$set": {"is_active": True}
+            },
+            upsert=True,
+            return_document=ReturnDocument.BEFORE
         )
         
         if existing:
-            # If exists but inactive, reactivate
-            if not existing.get("is_active", False):
-                await db.newsletter_subscribers.update_one(
-                    {"email": subscriber_data.email},
-                    {"$set": {"is_active": True}}
+            # If existed and was already active, raise exception
+            if existing.get("is_active", False):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Email already subscribed to newsletter"
                 )
-                return NewsletterSubscriber(**existing)
-            
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Email already subscribed to newsletter"
-            )
+            # If existed but was inactive, it's now reactivated
+            logger.info(f"Reactivated newsletter subscriber: {subscriber_data.email}")
+            # Ensure we return the subscriber with updated state
+            existing["is_active"] = True
+            return NewsletterSubscriber(**existing)
         
-        # Create new subscriber
-        subscriber = NewsletterSubscriber(**subscriber_data.dict())
-        
-        # Insert into database
-        result = await db.newsletter_subscribers.insert_one(subscriber.dict())
-        
-        if not result.inserted_id:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to subscribe to newsletter"
-            )
-        
-        logger.info(f"New newsletter subscriber: {subscriber.email}")
-        return subscriber
+        logger.info(f"New newsletter subscriber: {new_subscriber.email}")
+        return new_subscriber
     
     except HTTPException:
         raise
@@ -61,7 +61,7 @@ async def subscribe_newsletter(subscriber_data: NewsletterSubscriberCreate):
 
 
 @router.get("", response_model=List[NewsletterSubscriber])
-async def get_all_subscribers():
+async def get_all_subscribers(token: str = Depends(verify_admin_token)):
     """
     Get all newsletter subscribers (Admin endpoint)
     """
