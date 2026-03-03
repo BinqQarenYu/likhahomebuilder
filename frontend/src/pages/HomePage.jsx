@@ -126,19 +126,22 @@ const HomePage = () => {
   return (
     <div className="min-h-screen bg-black text-white">
       <Header />
-      
+
       {/* Hero Section */}
       <section className="relative pt-12 pb-8 px-4">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className="text-4xl md:text-6xl font-black mb-8 leading-tight" style={{ color: '#C4D600' }}>
             Download the 4 Most Profitable Steel Frame Modular Home Projects in the World Now
           </h1>
-          
+
           <div className="mb-8 rounded-2xl overflow-hidden max-w-4xl mx-auto">
+            {/* ⚡ Bolt: Eager load hero image for faster Largest Contentful Paint (LCP) */}
             <img
               src="https://images.unsplash.com/photo-1622683258861-fb6ff0e13054"
               alt="Modular Homes"
               className="w-full h-auto object-cover"
+              loading="eager"
+              fetchPriority="high"
             />
           </div>
 
@@ -159,7 +162,7 @@ const HomePage = () => {
               <p className="text-white text-sm mb-6 uppercase tracking-wider">
                 OPPORTUNITY FOR A LIMITED TIME
               </p>
-              
+
               <div className="mb-6">
                 <div className="inline-block border-2 rounded-xl px-6 py-3" style={{ borderColor: '#C4D600' }}>
                   <p className="text-white line-through text-xl mb-1">U$ 97,00</p>
@@ -205,7 +208,7 @@ const HomePage = () => {
           <h2 className="text-3xl md:text-4xl font-black text-center mb-12" style={{ color: '#C4D600' }}>
             The 4 Projects Included in the Package:
           </h2>
-          
+
           <div className="grid md:grid-cols-2 gap-8">
             {projects.map((project, index) => (
               <Card
@@ -219,16 +222,16 @@ const HomePage = () => {
                     </h3>
                     <p className="text-white text-base mb-6">{project.description}</p>
                   </div>
-                  <div className="relative h-[476px] overflow-hidden flex justify-center bg-zinc-900">
+                  <div className={`relative ${project.id === 1 ? 'h-[476px]' : 'h-64'} overflow-hidden flex justify-center bg-zinc-900`}>
                     {project.id === 1 ? (
-                      <iframe 
-                        src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1488990142658620%2F&show_text=false&width=267&t=0" 
-                        width="267" 
-                        height="476" 
-                        style={{ border: 'none', overflow: 'hidden' }} 
-                        scrolling="no" 
-                        frameBorder="0" 
-                        allowFullScreen={true} 
+                      <iframe
+                        src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1488990142658620%2F&show_text=false&width=267&t=0"
+                        width="267"
+                        height="476"
+                        style={{ border: 'none', overflow: 'hidden' }}
+                        scrolling="no"
+                        frameBorder="0"
+                        allowFullScreen={true}
                         allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
                         title={project.title}
                       ></iframe>
@@ -237,6 +240,7 @@ const HomePage = () => {
                         src={project.image}
                         alt={project.title}
                         className="w-full h-full object-cover"
+                        loading="lazy"
                       />
                     )}
                   </div>
@@ -262,10 +266,10 @@ const HomePage = () => {
             ))}
           </div>
         </div>
-      </section>
+      </section >
 
       {/* Why Perfect */}
-      <section className="py-16 px-4">
+      < section className="py-16 px-4" >
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-black text-center mb-12 text-white">
             Why Is This Package Perfect For You?
@@ -279,24 +283,26 @@ const HomePage = () => {
             ))}
           </div>
         </div>
-      </section>
+      </section >
 
       {/* Bonuses Section */}
-      <section className="py-16 px-4 bg-zinc-900">
+      < section className="py-16 px-4 bg-zinc-900" >
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-black text-center mb-4" style={{ color: '#C4D600' }}>
             🎁 EXCLUSIVE BONUSES FOR PEOPLE TO BUY TODAY:
           </h2>
-          
+
           <div className="grid md:grid-cols-3 gap-8 mt-12">
             {bonuses.map((bonus) => (
               <Card key={bonus.id} className="bg-black border-2 border-white rounded-3xl overflow-hidden">
                 <CardContent className="p-0">
                   <div className="relative h-48 overflow-hidden">
+                    {/* ⚡ Bolt: Lazy load below-the-fold images */}
                     <img
                       src={bonus.image}
                       alt={bonus.title}
                       className="w-full h-full object-cover"
+                      loading="lazy"
                     />
                   </div>
                   <div className="p-6">
@@ -320,10 +326,10 @@ const HomePage = () => {
             </p>
           </div>
         </div>
-      </section>
+      </section >
 
       {/* Urgency Section */}
-      <section className="py-16 px-4">
+      < section className="py-16 px-4" >
         <div className="max-w-3xl mx-auto text-center">
           <div className="bg-red-900/30 border-2 border-red-500 rounded-3xl p-8 mb-8">
             <h2 className="text-3xl md:text-4xl font-black text-red-500 mb-4">
@@ -338,10 +344,12 @@ const HomePage = () => {
           </div>
 
           <div className="mb-8">
+            {/* ⚡ Bolt: Lazy load below-the-fold images */}
             <img
               src="https://images.pexels.com/photos/12610487/pexels-photo-12610487.jpeg"
               alt="Limited Offer"
               className="w-full h-64 object-cover rounded-2xl"
+              loading="lazy"
             />
           </div>
 
@@ -353,7 +361,7 @@ const HomePage = () => {
               <p className="text-white text-sm mb-6 uppercase tracking-wider">
                 OPPORTUNITY FOR A LIMITED TIME
               </p>
-              
+
               <div className="mb-6">
                 <div className="inline-block border-2 rounded-xl px-6 py-3" style={{ borderColor: '#C4D600' }}>
                   <p className="text-white line-through text-xl mb-1">U$ 97,00</p>
@@ -391,22 +399,24 @@ const HomePage = () => {
           </Card>
 
           <div className="mb-8">
+            {/* ⚡ Bolt: Lazy load below-the-fold images */}
             <img
               src="https://via.placeholder.com/300x60/000000/FFFFFF?text=Secure+Payment"
               alt="Payment Methods"
               className="mx-auto h-16 object-contain"
+              loading="lazy"
             />
           </div>
         </div>
-      </section>
+      </section >
 
       {/* FAQ Section */}
-      <section className="py-16 px-4 bg-zinc-900">
+      < section className="py-16 px-4 bg-zinc-900" >
         <div className="max-w-3xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-black text-center mb-12 text-white">
             Frequently Asked Questions
           </h2>
-          
+
           <Accordion type="single" collapsible className="space-y-4">
             {faqs.map((faq, index) => (
               <AccordionItem
@@ -435,10 +445,10 @@ const HomePage = () => {
             </Button>
           </div>
         </div>
-      </section>
+      </section >
 
       <Footer />
-    </div>
+    </div >
   );
 };
 
