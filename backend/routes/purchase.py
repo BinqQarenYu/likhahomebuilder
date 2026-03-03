@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from typing import List
 import logging
 from models import PurchaseInquiry, PurchaseInquiryCreate
 from database import get_database
+from auth import verify_admin_token
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/purchase", tags=["purchase"])
@@ -40,7 +41,7 @@ async def submit_purchase_inquiry(inquiry_data: PurchaseInquiryCreate):
 
 
 @router.get("", response_model=List[PurchaseInquiry])
-async def get_all_inquiries():
+async def get_all_inquiries(token: str = Depends(verify_admin_token)):
     """
     Get all purchase inquiries (Admin endpoint)
     """

@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from typing import List
 import logging
 from models import ContactForm, ContactFormCreate
 from database import get_database
+from auth import verify_admin_token
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/contact", tags=["contact"])
@@ -40,7 +41,7 @@ async def submit_contact_form(form_data: ContactFormCreate):
 
 
 @router.get("", response_model=List[ContactForm])
-async def get_all_contacts():
+async def get_all_contacts(token: str = Depends(verify_admin_token)):
     """
     Get all contact form submissions (Admin endpoint)
     """

@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from typing import List
 import logging
 from models import NewsletterSubscriber, NewsletterSubscriberCreate
 from database import get_database
+from auth import verify_admin_token
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/newsletter", tags=["newsletter"])
@@ -61,7 +62,7 @@ async def subscribe_newsletter(subscriber_data: NewsletterSubscriberCreate):
 
 
 @router.get("", response_model=List[NewsletterSubscriber])
-async def get_all_subscribers():
+async def get_all_subscribers(token: str = Depends(verify_admin_token)):
     """
     Get all newsletter subscribers (Admin endpoint)
     """

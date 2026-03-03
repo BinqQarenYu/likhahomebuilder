@@ -9,8 +9,11 @@ import json
 import time
 from datetime import datetime
 
+import os
+
 # Base URL from frontend .env
-BASE_URL = "https://steel-house-project.preview.likhatechbuilder.com/api"
+BASE_URL = os.getenv("API_URL", "http://localhost:8000/api")
+ADMIN_TOKEN = os.getenv("ADMIN_SECRET_TOKEN", "default_secret_token_change_me")
 
 # Test data
 TEST_CONTACT_DATA = {
@@ -90,7 +93,11 @@ def test_get_all_contacts():
     """Test getting all contacts"""
     print("\n=== Testing Get All Contacts ===")
     try:
-        response = requests.get(f"{BASE_URL}/contact", timeout=10)
+        response = requests.get(
+            f"{BASE_URL}/contact",
+            headers={"X-Admin-Token": ADMIN_TOKEN},
+            timeout=10
+        )
         print(f"Status Code: {response.status_code}")
         
         if response.status_code == 200:
@@ -182,7 +189,11 @@ def test_get_newsletter_subscribers():
     """Test getting all newsletter subscribers"""
     print("\n=== Testing Get Newsletter Subscribers ===")
     try:
-        response = requests.get(f"{BASE_URL}/newsletter", timeout=10)
+        response = requests.get(
+            f"{BASE_URL}/newsletter",
+            headers={"X-Admin-Token": ADMIN_TOKEN},
+            timeout=10
+        )
         print(f"Status Code: {response.status_code}")
         
         if response.status_code == 200:
@@ -240,11 +251,31 @@ def test_purchase_inquiry():
         print(f"❌ Purchase inquiry error: {e}")
         return False
 
+def test_unauthorized_access():
+    """Test unauthorized access to admin endpoints"""
+    print("\n=== Testing Unauthorized Access ===")
+    try:
+        response = requests.get(f"{BASE_URL}/contact", timeout=10)
+        print(f"Status Code: {response.status_code}")
+        if response.status_code == 401:
+            print("✅ Unauthorized access correctly blocked")
+            return True
+        else:
+            print(f"❌ Unauthorized access should return 401, got {response.status_code}")
+            return False
+    except Exception as e:
+        print(f"❌ Unauthorized access test error: {e}")
+        return False
+
 def test_get_purchase_inquiries():
     """Test getting all purchase inquiries"""
     print("\n=== Testing Get Purchase Inquiries ===")
     try:
-        response = requests.get(f"{BASE_URL}/purchase", timeout=10)
+        response = requests.get(
+            f"{BASE_URL}/purchase",
+            headers={"X-Admin-Token": ADMIN_TOKEN},
+            timeout=10
+        )
         print(f"Status Code: {response.status_code}")
         
         if response.status_code == 200:
@@ -304,6 +335,9 @@ def run_all_tests():
     
     # Test 8: Get Purchase Inquiries
     test_results["get_inquiries"] = test_get_purchase_inquiries()
+
+    # Test 9: Unauthorized Access
+    test_results["unauthorized_access"] = test_unauthorized_access()
     
     # Summary
     print("\n" + "="*50)
