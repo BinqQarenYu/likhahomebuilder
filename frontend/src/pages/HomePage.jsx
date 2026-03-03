@@ -219,12 +219,26 @@ const HomePage = () => {
                     </h3>
                     <p className="text-white text-base mb-6">{project.description}</p>
                   </div>
-                  <div className="relative h-64 overflow-hidden">
-                    <img
-                      src={project.image}
-                      alt={project.title}
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="relative h-[476px] overflow-hidden flex justify-center bg-zinc-900">
+                    {project.id === 1 ? (
+                      <iframe 
+                        src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1488990142658620%2F&show_text=false&width=267&t=0" 
+                        width="267" 
+                        height="476" 
+                        style={{ border: 'none', overflow: 'hidden' }} 
+                        scrolling="no" 
+                        frameBorder="0" 
+                        allowFullScreen={true} 
+                        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                        title={project.title}
+                      ></iframe>
+                    ) : (
+                      <img
+                        src={project.image}
+                        alt={project.title}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
                   </div>
                 </CardContent>
               </Card>
