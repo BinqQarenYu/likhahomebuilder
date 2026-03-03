@@ -135,10 +135,13 @@ const HomePage = () => {
           </h1>
           
           <div className="mb-8 rounded-2xl overflow-hidden max-w-4xl mx-auto">
+            {/* ⚡ Bolt: Eager load hero image for faster Largest Contentful Paint (LCP) */}
             <img
               src="https://images.unsplash.com/photo-1622683258861-fb6ff0e13054"
               alt="Modular Homes"
               className="w-full h-auto object-cover"
+              loading="eager"
+              fetchPriority="high"
             />
           </div>
 
@@ -220,10 +223,12 @@ const HomePage = () => {
                     <p className="text-white text-base mb-6">{project.description}</p>
                   </div>
                   <div className="relative h-64 overflow-hidden">
+                    {/* ⚡ Bolt: Lazy load below-the-fold images to save initial bandwidth */}
                     <img
                       src={project.image}
                       alt={project.title}
                       className="w-full h-full object-cover"
+                      loading="lazy"
                     />
                   </div>
                 </CardContent>
@@ -279,10 +284,12 @@ const HomePage = () => {
               <Card key={bonus.id} className="bg-black border-2 border-white rounded-3xl overflow-hidden">
                 <CardContent className="p-0">
                   <div className="relative h-48 overflow-hidden">
+                    {/* ⚡ Bolt: Lazy load below-the-fold images */}
                     <img
                       src={bonus.image}
                       alt={bonus.title}
                       className="w-full h-full object-cover"
+                      loading="lazy"
                     />
                   </div>
                   <div className="p-6">
@@ -324,10 +331,12 @@ const HomePage = () => {
           </div>
 
           <div className="mb-8">
+            {/* ⚡ Bolt: Lazy load below-the-fold images */}
             <img
               src="https://images.pexels.com/photos/12610487/pexels-photo-12610487.jpeg"
               alt="Limited Offer"
               className="w-full h-64 object-cover rounded-2xl"
+              loading="lazy"
             />
           </div>
 
@@ -377,10 +386,12 @@ const HomePage = () => {
           </Card>
 
           <div className="mb-8">
+            {/* ⚡ Bolt: Lazy load below-the-fold images */}
             <img
               src="https://via.placeholder.com/300x60/000000/FFFFFF?text=Secure+Payment"
               alt="Payment Methods"
               className="mx-auto h-16 object-contain"
+              loading="lazy"
             />
           </div>
         </div>
