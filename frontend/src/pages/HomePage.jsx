@@ -134,12 +134,8 @@ const HomePage = () => {
             Download the 4 Most Profitable Steel Frame Modular Home Projects in the World Now
           </h1>
           
-          <div className="mb-8 rounded-2xl overflow-hidden max-w-4xl mx-auto">
-            <img
-              src="https://images.unsplash.com/photo-1622683258861-fb6ff0e13054"
-              alt="Modular Homes"
-              className="w-full h-auto object-cover"
-            />
+          <div className="mb-8 rounded-2xl overflow-hidden max-w-4xl mx-auto flex justify-center">
+            <iframe src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F896609346553070%2F&show_text=false&width=267&t=0" width="267" height="476" style={{border:"none",overflow:"hidden"}} scrolling="no" frameBorder="0" allowFullScreen={true} allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
           </div>
 
           <h2 className="text-xl md:text-2xl text-white mb-12 max-w-4xl mx-auto leading-relaxed">
