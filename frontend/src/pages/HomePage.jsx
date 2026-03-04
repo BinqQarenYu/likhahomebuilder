@@ -13,17 +13,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 
 const HomePage = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-
-  React.useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const projects = [
     {
