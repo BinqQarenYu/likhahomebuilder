@@ -13,7 +13,10 @@ import os
 
 # Base URL from frontend .env
 BASE_URL = os.getenv("API_URL", "http://localhost:8000/api")
-ADMIN_TOKEN = os.getenv("ADMIN_SECRET_TOKEN", "default_secret_token_change_me")
+ADMIN_TOKEN = os.getenv("ADMIN_SECRET_TOKEN")
+
+if not ADMIN_TOKEN:
+    print("⚠️  Warning: ADMIN_SECRET_TOKEN not set. Admin endpoints will fail if the server is running with a random UUID.")
 
 # Test data
 TEST_CONTACT_DATA = {
