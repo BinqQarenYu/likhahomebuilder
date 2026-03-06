@@ -2,4 +2,52 @@
 > frontend@0.1.0 start
 > craco start
 
-sh: 1: craco: not found
+(node:4058) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:4058) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+Starting the development server...
+
+Failed to compile.
+
+[eslint] Invalid Options:
+- Unknown options: extensions, resolvePluginsRelativeTo
+- 'extensions' has been removed.
+- 'resolvePluginsRelativeTo' has been removed.
+ERROR in [eslint] Invalid Options:
+- Unknown options: extensions, resolvePluginsRelativeTo
+- 'extensions' has been removed.
+- 'resolvePluginsRelativeTo' has been removed.
+
+ERROR in Error: Child compilation failed:
+  [eslint] Invalid Options:
+  - Unknown options: extensions, resolvePluginsRelativeTo
+  - 'extensions' has been removed.
+  - 'resolvePluginsRelativeTo' has been removed.
+
+  - child-compiler.js:211
+    [frontend]/[html-webpack-plugin@5.6.6_webpack@5.105.4]/[html-webpack-plugin]    /lib/child-compiler.js:211:18
+
+  - Compiler.js:648 finalCallback
+    [frontend]/[webpack@5.105.4]/[webpack]/lib/Compiler.js:648:5
+
+  - Compiler.js:684
+    [frontend]/[webpack@5.105.4]/[webpack]/lib/Compiler.js:684:11
+
+  - Compiler.js:1379
+    [frontend]/[webpack@5.105.4]/[webpack]/lib/Compiler.js:1379:17
+
+
+  - Hook.js:21 Hook.CALL_ASYNC_DELEGATE [as _callAsync]
+    [frontend]/[tapable@2.3.0]/[tapable]/lib/Hook.js:21:14
+
+  - Compiler.js:1375
+    [frontend]/[webpack@5.105.4]/[webpack]/lib/Compiler.js:1375:33
+
+  - Compilation.js:3183 finalCallback
+    [frontend]/[webpack@5.105.4]/[webpack]/lib/Compilation.js:3183:11
+
+  - Compilation.js:3521
+    [frontend]/[webpack@5.105.4]/[webpack]/lib/Compilation.js:3521:11
+
+1 ERROR in child compilations (Use 'stats.children: true' resp. '--stats-children' for more details)
+webpack compiled with 3 errors

@@ -44,7 +44,7 @@ const ImageCarousel = ({ images }) => {
       <button
         onClick={handlePrev}
         aria-label="Previous Slide"
-        className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 text-white p-2.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[#C4D600] hover:text-black border-2 border-transparent z-10"
+        className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 text-white p-2.5 rounded-full opacity-0 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none transition-opacity hover:bg-[#C4D600] hover:text-black border-2 border-transparent z-10"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -54,7 +54,7 @@ const ImageCarousel = ({ images }) => {
       <button
         onClick={handleNext}
         aria-label="Next Slide"
-        className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white p-2.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[#C4D600] hover:text-black border-2 border-transparent z-10"
+        className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white p-2.5 rounded-full opacity-0 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none transition-opacity hover:bg-[#C4D600] hover:text-black border-2 border-transparent z-10"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -64,9 +64,12 @@ const ImageCarousel = ({ images }) => {
       {/* Dots Indicator */}
       <div className="absolute bottom-5 left-0 right-0 px-4 z-10 flex flex-wrap justify-center gap-2">
         {images.map((_, idx) => (
-          <div
+          <button
             key={idx}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${idx === currentIndex ? 'bg-[#C4D600] scale-125' : 'bg-white/50'}`}
+            onClick={() => setCurrentIndex(idx)}
+            aria-label={`Go to slide ${idx + 1}`}
+            aria-selected={idx === currentIndex}
+            className={`w-2 h-2 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black ${idx === currentIndex ? 'bg-[#C4D600] scale-125' : 'bg-white/50 hover:bg-white/75'}`}
           />
         ))}
       </div>
