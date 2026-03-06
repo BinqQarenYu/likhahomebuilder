@@ -28,11 +28,15 @@ const ImageCarousel = ({ images }) => {
   const imagesCount = images.length;
 
   const handleNext = (count = 1) => {
-    setCurrentIndex((prev) => (prev + count) % imagesCount);
+    const moveCount = typeof count === 'number' ? count : 1;
+    setTransitionDuration(400); // Snappier manual navigation
+    setCurrentIndex((prev) => (prev + moveCount) % imagesCount);
   };
 
   const handlePrev = (count = 1) => {
-    setCurrentIndex((prev) => (prev - count + imagesCount * count) % imagesCount);
+    const moveCount = typeof count === 'number' ? count : 1;
+    setTransitionDuration(400); // Snappier manual navigation
+    setCurrentIndex((prev) => (prev - moveCount + imagesCount) % imagesCount);
   };
 
   // Auto-play Logic (4 seconds)
@@ -213,6 +217,7 @@ const ImageCarousel = ({ images }) => {
               const diff = (i - currentIndex + imagesCount) % imagesCount;
               const distance = diff > imagesCount / 2 ? diff - imagesCount : diff;
               if (Math.abs(distance) >= 1 && Math.abs(distance) <= 2) {
+                setTransitionDuration(400);
                 setCurrentIndex(i);
               }
             }}
@@ -228,37 +233,39 @@ const ImageCarousel = ({ images }) => {
       </div>
 
       {/* Modern Controls */}
-      <div className="absolute bottom-8 left-0 right-0 flex justify-center items-center gap-6 z-50">
-        <button
-          onClick={handlePrev}
-          className="p-3 bg-white/5 hover:bg-[#C4D600]/20 text-white rounded-full transition-all border border-white/10 hover:border-[#C4D600]/40 group"
-          aria-label="Previous"
-        >
-          <svg className="w-6 h-6 transform transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
+      <div className="absolute inset-0 pointer-events-none z-[110] flex items-end justify-center pb-8">
+        <div className="flex justify-center items-center gap-6 pointer-events-auto">
+          <button
+            onClick={() => handlePrev(1)}
+            className="p-3 bg-white/5 hover:bg-[#C4D600] text-white hover:text-black rounded-full transition-all border border-white/10 hover:border-[#C4D600] group"
+            aria-label="Previous"
+          >
+            <svg className="w-6 h-6 transform transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
 
-        {/* Progress Indicators */}
-        <div className="flex gap-2">
-          {images.map((_, i) => (
-            <div
-              key={i}
-              className={`transition-all duration-300 rounded-full ${i === currentIndex ? 'w-8 h-1.5 bg-[#C4D600]' : 'w-1.5 h-1.5 bg-white/20'
-                }`}
-            />
-          ))}
+          {/* Progress Indicators */}
+          <div className="flex gap-2">
+            {images.map((_, i) => (
+              <div
+                key={i}
+                className={`transition-all duration-300 rounded-full ${i === currentIndex ? 'w-8 h-1.5 bg-[#C4D600]' : 'w-1.5 h-1.5 bg-white/20'
+                  }`}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={() => handleNext(1)}
+            className="p-3 bg-white/5 hover:bg-[#C4D600] text-white hover:text-black rounded-full transition-all border border-white/10 hover:border-[#C4D600] group"
+            aria-label="Next"
+          >
+            <svg className="w-6 h-6 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
-
-        <button
-          onClick={handleNext}
-          className="p-3 bg-white/5 hover:bg-[#C4D600]/20 text-white rounded-full transition-all border border-white/10 hover:border-[#C4D600]/40 group"
-          aria-label="Next"
-        >
-          <svg className="w-6 h-6 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
       </div>
 
       {/* Decorative Gradient Overlay for Depth */}
