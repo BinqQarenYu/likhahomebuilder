@@ -35,7 +35,8 @@ const ImageCarousel = ({ images }) => {
             src={img}
             alt={`Slide ${i + 1}`}
             className="w-full h-full object-cover flex-shrink-0"
-            loading="lazy"
+            loading={i === 0 ? "eager" : "lazy"}
+            fetchPriority={i === 0 ? "high" : "auto"}
           />
         ))}
       </div>
@@ -75,17 +76,8 @@ const ImageCarousel = ({ images }) => {
 };
 
 const HomePage = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-
-  React.useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Tell the Facebook SDK to look for and "wake up" the videos on the page
   React.useEffect(() => {
