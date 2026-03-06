@@ -424,7 +424,7 @@ const HomePage = () => {
           </div>
 
           <h2 className="text-xl md:text-2xl text-white mb-12 max-w-4xl mx-auto leading-relaxed">
-            Start generating passive income with Airbnb this month — with ready-made, easy-to-execute projects that fit your budget.
+            Redefine your lifestyle with a high-end tiny house. Our complete steel frame projects combine modern minimalist design with unmatched durability, giving you the freedom to live anywhere without compromise.
           </h2>
         </div>
       </section>
