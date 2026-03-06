@@ -393,7 +393,7 @@ const HomePage = () => {
       <section className="relative pt-12 pb-8 px-4">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className="text-4xl md:text-6xl font-black mb-8 leading-tight" style={{ color: '#C4D600' }}>
-            Download the 4 Most Profitable Steel Frame Modular Home Projects in the World Now
+            Steel Frame Modular Home Projects
           </h1>
 
           <div className="mb-12 w-full overflow-visible">
