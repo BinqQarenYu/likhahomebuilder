@@ -433,33 +433,33 @@ const HomePage = () => {
       <section className="py-12 px-4">
         <div className="max-w-2xl mx-auto">
           <Card className="bg-black border-2 border-white rounded-3xl overflow-hidden">
-            <CardContent className="p-8 text-center">
-              <h3 className="text-3xl md:text-4xl font-black text-white mb-4">
-                Combo 4 Complete Projects
+            <CardContent className="p-10 text-center">
+              <h3 className="text-3xl md:text-5xl font-black text-white mb-4 uppercase">
+                Complete Architectural Design
               </h3>
-              <p className="text-white text-sm mb-6 uppercase tracking-wider">
-                OPPORTUNITY FOR A LIMITED TIME
+              <p className="text-[#C4D600] text-lg mb-10 tracking-[0.2em] font-bold">
+                FULL BLUEPRINTS & 3D VISUALIZATION
               </p>
 
-              <div className="mb-6">
-                <div className="inline-block border-2 rounded-xl px-6 py-3" style={{ borderColor: '#C4D600' }}>
-                  <p className="text-white line-through text-xl mb-1">U$ 97,00</p>
-                  <p className="text-5xl md:text-6xl font-black" style={{ color: '#C4D600' }}>
-                    $19,90
+              <div className="mb-10">
+                <div className="inline-block py-2">
+                  <p className="text-white text-lg opacity-80 mb-2 font-medium">Starting at</p>
+                  <p className="text-5xl md:text-7xl font-black" style={{ color: '#C4D600' }}>
+                    ₱55,000
                   </p>
                 </div>
               </div>
 
-              <p className="text-white text-lg mb-8 uppercase font-semibold">
-                LESS THAN U$ 5 EACH PROJECT
+              <p className="text-white text-base md:text-lg mb-10 tracking-widest font-semibold border-y border-white/20 py-4 opacity-90 uppercase">
+                INCLUDES FLOOR PLANS, ELEVATIONS, AND 3D RENDERS
               </p>
 
               <Button
                 onClick={handlePurchase}
-                className="w-full text-xl py-6 font-bold rounded-full transition-all duration-300 hover:scale-105"
+                className="w-full md:w-auto px-12 text-xl py-8 font-black rounded-none transition-all duration-300 hover:bg-white hover:text-black hover:tracking-[0.1em]"
                 style={{ backgroundColor: '#C4D600', color: '#000' }}
               >
-                YES, I WANT TO TAKE ADVANTAGE NOW
+                GET A FREE QUOTE
               </Button>
             </CardContent>
           </Card>
