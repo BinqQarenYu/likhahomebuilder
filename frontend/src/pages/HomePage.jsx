@@ -14,63 +14,166 @@ import Footer from '../components/Footer';
 
 const ImageCarousel = ({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
+
+  const imagesCount = images.length;
 
   const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % images.length);
+    setCurrentIndex((prev) => (prev + 1) % imagesCount);
   };
 
   const handlePrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+    setCurrentIndex((prev) => (prev - 1 + imagesCount) % imagesCount);
+  };
+
+  // Auto-play Logic (4 seconds)
+  React.useEffect(() => {
+    if (isHovered) return;
+    const interval = setInterval(handleNext, 4000);
+    return () => clearInterval(interval);
+  }, [currentIndex, isHovered]);
+
+  // Touch handlers for mobile swipe
+  const handleTouchStart = (e) => setTouchStart(e.targetTouches[0].clientX);
+  const handleTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+    if (isLeftSwipe) handleNext();
+    if (isRightSwipe) handlePrev();
+    setTouchStart(0);
+    setTouchEnd(0);
+  };
+
+  const getImageStyles = (index) => {
+    // Normalizing index to get shortest circular distance
+    let diff = index - currentIndex;
+    if (diff > imagesCount / 2) diff -= imagesCount;
+    if (diff < -imagesCount / 2) diff += imagesCount;
+
+    const absDiff = Math.abs(diff);
+
+    // Core Transformations (Mathematical Constraints)
+    // - Center: scale(1.1), z: 50, opacity: 1.0, rotateY(0deg)
+    // - Inner (L1/R1): scale(0.9), z: 40, opacity: 0.7, rotateY(±15deg)
+    // - Outer (L2/R2): scale(0.8), z: 30, opacity: 0.4, rotateY(±30deg)
+
+    let scale = 1;
+    let rotateY = 0;
+    let opacity = 0;
+    let zIndex = 0;
+    let translateX = 0;
+
+    if (absDiff === 0) {
+      scale = 1.1;
+      rotateY = 0;
+      opacity = 1;
+      zIndex = 50;
+      translateX = 0;
+    } else if (absDiff === 1) {
+      scale = 0.9;
+      rotateY = diff > 0 ? -15 : 15;
+      opacity = 0.7;
+      zIndex = 40;
+      translateX = diff > 0 ? 45 : -45; // Responsive offset
+    } else if (absDiff === 2) {
+      scale = 0.8;
+      rotateY = diff > 0 ? -30 : 30;
+      opacity = 0.4;
+      zIndex = 30;
+      translateX = diff > 0 ? 80 : -80;
+    } else {
+      // Hide everything else or move far away
+      opacity = 0;
+      zIndex = 0;
+      translateX = diff > 0 ? 120 : -120;
+      scale = 0.5;
+    }
+
+    return {
+      transform: `translateX(${translateX}%) scale(${scale}) rotateY(${rotateY}deg)`,
+      zIndex: zIndex,
+      opacity: opacity,
+      transition: 'all 600ms cubic-bezier(0.4, 0, 0.2, 1)',
+      pointerEvents: absDiff === 0 ? 'auto' : 'none',
+      cursor: absDiff === 1 || absDiff === 2 ? 'pointer' : 'default',
+    };
   };
 
   return (
-    <div className="relative w-full h-full aspect-[500/903] overflow-hidden group">
-      <div
-        className="flex transition-transform duration-500 ease-out w-full h-full"
-        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-      >
+    <div
+      className="relative w-full h-[450px] md:h-[600px] flex items-center justify-center overflow-hidden [perspective:1000px] bg-black"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      <div className="relative w-[180px] md:w-[260px] h-[320px] md:h-[480px] [transform-style:preserve-3d]">
         {images.map((img, i) => (
-          <img
-            key={i}
-            src={img}
-            alt={`Slide ${i + 1}`}
-            className="w-full h-full object-cover flex-shrink-0"
-            loading={i === 0 ? "eager" : "lazy"}
-            fetchPriority={i === 0 ? "high" : "auto"}
-          />
-        ))}
-      </div>
-
-      {/* Navigation Buttons */}
-      <button
-        onClick={handlePrev}
-        aria-label="Previous Slide"
-        className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 text-white p-2.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[#C4D600] hover:text-black border-2 border-transparent z-10"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
-
-      <button
-        onClick={handleNext}
-        aria-label="Next Slide"
-        className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white p-2.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[#C4D600] hover:text-black border-2 border-transparent z-10"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-        </svg>
-      </button>
-
-      {/* Dots Indicator */}
-      <div className="absolute bottom-5 left-0 right-0 px-4 z-10 flex flex-wrap justify-center gap-2">
-        {images.map((_, idx) => (
           <div
-            key={idx}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${idx === currentIndex ? 'bg-[#C4D600] scale-125' : 'bg-white/50'}`}
-          />
+            key={i}
+            className="absolute inset-0 w-full h-full rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.8)] border border-white/10"
+            style={getImageStyles(i)}
+            onClick={() => {
+              const diff = (i - currentIndex + imagesCount) % imagesCount;
+              const distance = diff > imagesCount / 2 ? diff - imagesCount : diff;
+              if (Math.abs(distance) === 1 || Math.abs(distance) === 2) {
+                setCurrentIndex(i);
+              }
+            }}
+          >
+            <img
+              src={img}
+              alt={`Project ${i + 1}`}
+              className="w-full h-full object-cover select-none"
+              loading={Math.abs(i - currentIndex) <= 2 ? "eager" : "lazy"}
+            />
+          </div>
         ))}
       </div>
+
+      {/* Modern Controls */}
+      <div className="absolute bottom-8 left-0 right-0 flex justify-center items-center gap-6 z-50">
+        <button
+          onClick={handlePrev}
+          className="p-3 bg-white/5 hover:bg-[#C4D600]/20 text-white rounded-full transition-all border border-white/10 hover:border-[#C4D600]/40 group"
+          aria-label="Previous"
+        >
+          <svg className="w-6 h-6 transform transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+
+        {/* Progress Indicators */}
+        <div className="flex gap-2">
+          {images.map((_, i) => (
+            <div
+              key={i}
+              className={`transition-all duration-300 rounded-full ${i === currentIndex ? 'w-8 h-1.5 bg-[#C4D600]' : 'w-1.5 h-1.5 bg-white/20'
+                }`}
+            />
+          ))}
+        </div>
+
+        <button
+          onClick={handleNext}
+          className="p-3 bg-white/5 hover:bg-[#C4D600]/20 text-white rounded-full transition-all border border-white/10 hover:border-[#C4D600]/40 group"
+          aria-label="Next"
+        >
+          <svg className="w-6 h-6 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Decorative Gradient Overlay for Depth */}
+      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent pointer-events-none" />
     </div>
   );
 };
@@ -196,7 +299,7 @@ const HomePage = () => {
             Download the 4 Most Profitable Steel Frame Modular Home Projects in the World Now
           </h1>
 
-          <div className="mb-8 rounded-2xl overflow-hidden max-w-[320px] mx-auto bg-black border-2 border-[#C4D600]">
+          <div className="mb-12 w-full overflow-visible">
             <ImageCarousel
               images={[
                 '/carousel/122.jpg',
