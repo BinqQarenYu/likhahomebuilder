@@ -15,58 +15,116 @@ import Footer from '../components/Footer';
 const ImageCarousel = ({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
-  const [touchStart, setTouchStart] = useState(0);
-  const [touchEnd, setTouchEnd] = useState(0);
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [mouseY, setMouseY] = useState(0);
+
+  // Velocity Navigation State
+  const [dragStart, setDragStart] = useState(0);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [startTime, setStartTime] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [transitionDuration, setTransitionDuration] = useState(600);
 
   const imagesCount = images.length;
 
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % imagesCount);
+  const handleNext = (count = 1) => {
+    setCurrentIndex((prev) => (prev + count) % imagesCount);
   };
 
-  const handlePrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + imagesCount) % imagesCount);
+  const handlePrev = (count = 1) => {
+    setCurrentIndex((prev) => (prev - count + imagesCount * count) % imagesCount);
   };
 
   // Auto-play Logic (4 seconds)
   React.useEffect(() => {
-    if (isHovered) return;
-    const interval = setInterval(handleNext, 4000);
+    if (isHovered || isDragging) return;
+    const interval = setInterval(() => {
+      setTransitionDuration(600);
+      handleNext();
+    }, 4000);
     return () => clearInterval(interval);
-  }, [currentIndex, isHovered]);
+  }, [currentIndex, isHovered, isDragging]);
 
-  // Touch handlers for mobile swipe
-  const handleTouchStart = (e) => setTouchStart(e.targetTouches[0].clientX);
-  const handleTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
-  const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > 50;
-    const isRightSwipe = distance < -50;
-    if (isLeftSwipe) handleNext();
-    if (isRightSwipe) handlePrev();
-    setTouchStart(0);
-    setTouchEnd(0);
+  const handleStart = (clientX) => {
+    setDragStart(clientX);
+    setStartTime(Date.now());
+    setIsDragging(true);
+    setDragOffset(0);
+  };
+
+  const handleMove = (clientX) => {
+    if (!isDragging) return;
+    const offset = clientX - dragStart;
+    setDragOffset(offset);
+  };
+
+  const handleEnd = (clientX) => {
+    if (!isDragging) return;
+
+    const distance = dragStart - clientX;
+    const duration = Date.now() - startTime;
+    const velocity = Math.abs(distance) / (duration || 1); // px/ms
+
+    // Momentum logic
+    if (Math.abs(distance) > 30) {
+      let framesToMove = 1;
+      if (velocity > 1.5) framesToMove = 3;
+      else if (velocity > 0.8) framesToMove = 2;
+
+      // Dynamic Easing (shorter duration for higher velocity)
+      const dynamicDuration = Math.max(300, 600 - velocity * 100);
+      setTransitionDuration(dynamicDuration);
+
+      if (distance > 0) handleNext(framesToMove);
+      else handlePrev(framesToMove);
+    }
+
+    setIsDragging(false);
+    setDragOffset(0);
+  };
+
+  // Event Adapters for unified Touch & Mouse support
+  const onTouchStart = (e) => handleStart(e.touches[0].clientX);
+  const onTouchMove = (e) => handleMove(e.touches[0].clientX);
+  const onTouchEnd = (e) => handleEnd(e.changedTouches[0].clientX);
+
+  const onMouseDown = (e) => {
+    handleStart(e.clientX);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
+
+  const onMouseMove = (e) => handleMove(e.clientX);
+  const onMouseUp = (e) => {
+    handleEnd(e.clientX);
+    window.removeEventListener('mousemove', onMouseMove);
+    window.removeEventListener('mouseup', onMouseUp);
+  };
+
+  const handleFrameMouseMove = (e, index) => {
+    if (index !== currentIndex && index !== hoveredIndex) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const y = e.clientY - rect.top;
+    const percentY = (y / rect.height) * 2 - 1; // -1 to 1
+    setMouseY(percentY);
   };
 
   const getImageStyles = (index) => {
-    // Normalizing index to get shortest circular distance
     let diff = index - currentIndex;
     if (diff > imagesCount / 2) diff -= imagesCount;
     if (diff < -imagesCount / 2) diff += imagesCount;
 
     const absDiff = Math.abs(diff);
-
-    // Core Transformations (Mathematical Constraints)
-    // - Center: scale(1.1), z: 50, opacity: 1.0, rotateY(0deg)
-    // - Inner (L1/R1): scale(0.9), z: 40, opacity: 0.7, rotateY(±15deg)
-    // - Outer (L2/R2): scale(0.8), z: 30, opacity: 0.4, rotateY(±30deg)
+    const isThisHovered = hoveredIndex === index;
+    const isCenter = absDiff === 0;
 
     let scale = 1;
     let rotateY = 0;
+    let rotateX = 0;
     let opacity = 0;
     let zIndex = 0;
     let translateX = 0;
+    let boxShadow = '0 20px 50px rgba(0,0,0,0.8)';
 
     if (absDiff === 0) {
       scale = 1.1;
@@ -74,12 +132,16 @@ const ImageCarousel = ({ images }) => {
       opacity = 1;
       zIndex = 50;
       translateX = 0;
+      // Active State Glow
+      boxShadow = isThisHovered
+        ? '0 0 40px rgba(255,255,255,0.3), 0 20px 50px rgba(0,0,0,0.8)'
+        : '0 0 20px rgba(255,255,255,0.1), 0 20px 50px rgba(0,0,0,0.8)';
     } else if (absDiff === 1) {
       scale = 0.9;
       rotateY = diff > 0 ? -15 : 15;
       opacity = 0.7;
       zIndex = 40;
-      translateX = diff > 0 ? 45 : -45; // Responsive offset
+      translateX = diff > 0 ? 45 : -45;
     } else if (absDiff === 2) {
       scale = 0.8;
       rotateY = diff > 0 ? -30 : 30;
@@ -87,42 +149,70 @@ const ImageCarousel = ({ images }) => {
       zIndex = 30;
       translateX = diff > 0 ? 80 : -80;
     } else {
-      // Hide everything else or move far away
       opacity = 0;
       zIndex = 0;
       translateX = diff > 0 ? 120 : -120;
       scale = 0.5;
     }
 
+    if (isThisHovered && !isDragging) {
+      scale += 0.05; // Hover Lift
+      zIndex += 10;  // Boost Depth
+      rotateX = -mouseY * 5; // 3D Tilt
+    }
+
     return {
-      transform: `translateX(${translateX}%) scale(${scale}) rotateY(${rotateY}deg)`,
+      transform: `translateX(${translateX}%) scale(${scale}) rotateY(${rotateY}deg) rotateX(${rotateX}deg)`,
       zIndex: zIndex,
       opacity: opacity,
-      transition: 'all 600ms cubic-bezier(0.4, 0, 0.2, 1)',
-      pointerEvents: absDiff === 0 ? 'auto' : 'none',
-      cursor: absDiff === 1 || absDiff === 2 ? 'pointer' : 'default',
+      boxShadow: boxShadow,
+      transition: isThisHovered && !isDragging
+        ? 'transform 200ms ease-out, opacity 600ms, box-shadow 200ms'
+        : `transform ${transitionDuration}ms cubic-bezier(0.4, 0, 0.2, 1), opacity 600ms, z-index 600ms, box-shadow 600ms`,
+      pointerEvents: absDiff <= 2 ? 'auto' : 'none',
+      cursor: isCenter ? (isDragging ? 'grabbing' : 'grab') : 'pointer',
+      backfaceVisibility: 'hidden',
+      WebkitBackfaceVisibility: 'hidden',
+      transformStyle: 'preserve-3d',
     };
   };
 
   return (
     <div
-      className="relative w-full h-[450px] md:h-[600px] flex items-center justify-center overflow-hidden [perspective:1000px] bg-black"
+      className="relative w-full h-[450px] md:h-[600px] flex items-center justify-center overflow-hidden [perspective:1200px] bg-black select-none"
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setHoveredIndex(null);
+        setMouseY(0);
+      }}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      onMouseDown={onMouseDown}
     >
-      <div className="relative w-[180px] md:w-[260px] h-[320px] md:h-[480px] [transform-style:preserve-3d]">
+      <div
+        className="relative w-[180px] md:w-[260px] h-[320px] md:h-[480px] [transform-style:preserve-3d] transition-transform duration-200"
+        style={{
+          transform: `rotateY(${dragOffset / 10}deg)`, // Visual Fan Tilt during drag
+          cursor: isDragging ? 'grabbing' : 'grab'
+        }}
+      >
         {images.map((img, i) => (
           <div
             key={i}
-            className="absolute inset-0 w-full h-full rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.8)] border border-white/10"
+            className="absolute inset-0 w-full h-full rounded-2xl overflow-hidden border border-white/10"
             style={getImageStyles(i)}
+            onMouseEnter={() => setHoveredIndex(i)}
+            onMouseMove={(e) => handleFrameMouseMove(e, i)}
+            onMouseLeave={() => {
+              setHoveredIndex(null);
+              setMouseY(0);
+            }}
             onClick={() => {
               const diff = (i - currentIndex + imagesCount) % imagesCount;
               const distance = diff > imagesCount / 2 ? diff - imagesCount : diff;
-              if (Math.abs(distance) === 1 || Math.abs(distance) === 2) {
+              if (Math.abs(distance) >= 1 && Math.abs(distance) <= 2) {
                 setCurrentIndex(i);
               }
             }}
@@ -130,7 +220,7 @@ const ImageCarousel = ({ images }) => {
             <img
               src={img}
               alt={`Project ${i + 1}`}
-              className="w-full h-full object-cover select-none"
+              className="w-full h-full object-cover select-none pointer-events-none"
               loading={Math.abs(i - currentIndex) <= 2 ? "eager" : "lazy"}
             />
           </div>
