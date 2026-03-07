@@ -227,7 +227,9 @@ const ImageCarousel = ({ images }) => {
               src={img}
               alt={`Project ${i + 1}`}
               className="w-full h-full object-cover select-none pointer-events-none"
-              loading={Math.abs(i - currentIndex) <= 2 ? "eager" : "lazy"}
+              loading={Math.min(Math.abs(i - currentIndex), imagesCount - Math.abs(i - currentIndex)) <= 2 ? "eager" : "lazy"}
+              decoding="async"
+              fetchpriority={i === currentIndex ? "high" : "auto"}
             />
           </div>
         ))}
