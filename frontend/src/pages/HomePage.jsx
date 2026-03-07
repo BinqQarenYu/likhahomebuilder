@@ -408,26 +408,26 @@ const HomePage = () => {
           <div className="mb-12 w-full overflow-visible">
             <ImageCarousel
               images={[
-                '/carousel/122.jpg',
-                '/carousel/123.jpg',
-                '/carousel/124.jpg',
-                '/carousel/126.jpg',
-                '/carousel/126A.jpg',
-                '/carousel/128A.jpg',
-                '/carousel/128B.jpg',
-                '/carousel/128D.jpg',
-                '/carousel/129A.jpg',
-                '/carousel/129C.jpg',
-                '/carousel/130A.jpg',
-                '/carousel/130B.jpg',
-                '/carousel/130C.jpg',
-                '/carousel/131A.jpg',
-                '/carousel/131B.jpg',
-                '/carousel/131C.jpg',
-                '/carousel/132A.jpg',
-                '/carousel/132B.jpg',
-                '/carousel/file_1772370111389.jpg',
-                '/carousel/file_1772370122487.jpg'
+                '/carousel/lowres/122.jpg',
+                '/carousel/lowres/123.jpg',
+                '/carousel/lowres/124.jpg',
+                '/carousel/lowres/126.jpg',
+                '/carousel/lowres/126A.jpg',
+                '/carousel/lowres/128A.jpg',
+                '/carousel/lowres/128B.jpg',
+                '/carousel/lowres/128D.jpg',
+                '/carousel/lowres/129A.jpg',
+                '/carousel/lowres/129C.jpg',
+                '/carousel/lowres/130A.jpg',
+                '/carousel/lowres/130B.jpg',
+                '/carousel/lowres/130C.jpg',
+                '/carousel/lowres/131A.jpg',
+                '/carousel/lowres/131B.jpg',
+                '/carousel/lowres/131C.jpg',
+                '/carousel/lowres/132A.jpg',
+                '/carousel/lowres/132B.jpg',
+                '/carousel/lowres/file_1772370111389.jpg',
+                '/carousel/lowres/file_1772370122487.jpg'
               ]}
             />
           </div>
