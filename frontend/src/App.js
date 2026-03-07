@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
@@ -11,7 +11,7 @@ import { Toaster } from './components/ui/toaster';
 function App() {
   return (
     <div className="App">
-      <BrowserRouter>
+      <HashRouter basename={process.env.PUBLIC_URL}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
@@ -20,7 +20,7 @@ function App() {
           <Route path="/terms" element={<TermsPage />} />
         </Routes>
         <Toaster />
-      </BrowserRouter>
+      </HashRouter>
     </div>
   );
 }
