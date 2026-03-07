@@ -4,7 +4,8 @@ import { Home, Phone, Mail, Menu, X, Facebook, Instagram, Music, Youtube } from 
 import { Button } from '../components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '../components/ui/sheet';
 
-const Header = () => {
+// ⚡ Bolt: Memoize Header to prevent unnecessary re-renders on page state changes.
+const Header = React.memo(() => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
@@ -147,6 +148,6 @@ const Header = () => {
       </div>
     </header>
   );
-};
+});
 
 export default Header;

@@ -9,7 +9,8 @@ import axios from 'axios';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const Footer = () => {
+// ⚡ Bolt: Memoize Footer to prevent unnecessary re-renders on page state changes.
+const Footer = React.memo(() => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -209,6 +210,6 @@ const Footer = () => {
       </div>
     </footer>
   );
-};
+});
 
 export default Footer;
