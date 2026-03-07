@@ -11,7 +11,7 @@ import { Toaster } from './components/ui/toaster';
 function App() {
   return (
     <div className="App">
-      <HashRouter basename={process.env.PUBLIC_URL}>
+      <HashRouter>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
