@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Check, Download } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import {
@@ -278,6 +279,7 @@ const ImageCarousel = ({ images }) => {
 const HomePage = () => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Tell the Facebook SDK to look for and "wake up" the videos on the page
   React.useEffect(() => {
@@ -377,12 +379,17 @@ const HomePage = () => {
     },
   ];
 
-  const handlePurchase = async () => {
-    // For now, show alert - can be replaced with actual purchase flow later
-    toast({
-      title: 'Purchase Inquiry',
-      description: 'Please contact us or fill out the contact form to proceed with your purchase.',
-    });
+  const handlePurchase = () => {
+    navigate('/contact#contact-form');
+    // Scroll to top first in case already on contact page or to trigger hash jump
+    window.scrollTo(0, 0);
+    // Use a small timeout to let the page load then jump to hash
+    setTimeout(() => {
+      const element = document.getElementById('contact-form');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
   };
 
   return (
@@ -624,15 +631,15 @@ const HomePage = () => {
       {/* Urgency Section */}
       < section className="py-16 px-4" >
         <div className="max-w-3xl mx-auto text-center">
-          <div className="bg-red-900/30 border-2 border-red-500 rounded-3xl p-8 mb-8">
-            <h2 className="text-3xl md:text-4xl font-black text-red-500 mb-4">
-              ⚠️ This offer is ending!
+          <div className="bg-zinc-900/50 border-2 border-[#C4D600]/30 rounded-3xl p-8 mb-8">
+            <h2 className="text-3xl md:text-4xl font-black text-white mb-4">
+              Step Into Your Future Home
             </h2>
-            <p className="text-xl text-white mb-3">
-              We only release a limited number of downloads of this project per month.
+            <p className="text-xl text-gray-300 mb-4">
+              We provide more than just designs; we deliver complete, construction-ready blueprints paired with detailed material and labor estimates.
             </p>
-            <p className="text-xl text-white">
-              ✅ This means that download slots may sell out at any time. Additionally, this special promotion and the 3 exclusive bonuses will only be available for a limited time.
+            <p className="text-xl text-white font-medium">
+              ✅ Get everything you need to start construction immediately—from structural steel specifications to professional cost projections that keep your investment secure.
             </p>
           </div>
 
@@ -647,47 +654,32 @@ const HomePage = () => {
           </div>
 
           <Card className="bg-black border-2 border-white rounded-3xl overflow-hidden mb-8">
-            <CardContent className="p-8 text-center">
-              <h3 className="text-3xl md:text-4xl font-black text-white mb-4">
-                Combo 4 Complete Projects
+            <CardContent className="p-10 text-center">
+              <h3 className="text-3xl md:text-5xl font-black text-white mb-4 uppercase">
+                Complete Architectural Design
               </h3>
-              <p className="text-white text-sm mb-6 uppercase tracking-wider">
-                OPPORTUNITY FOR A LIMITED TIME
+              <p className="text-[#C4D600] text-lg mb-10 tracking-[0.2em] font-bold">
+                FULL BLUEPRINTS & 3D VISUALIZATION
               </p>
 
-              <div className="mb-6">
-                <div className="inline-block border-2 rounded-xl px-6 py-3" style={{ borderColor: '#C4D600' }}>
-                  <p className="text-white line-through text-xl mb-1">U$ 97,00</p>
-                  <p className="text-5xl md:text-6xl font-black" style={{ color: '#C4D600' }}>
-                    $19,90
-                  </p>
-                </div>
+              <div className="mb-10 text-center">
+                <p className="text-white text-lg opacity-80 mb-2 font-medium">Starting at</p>
+                <p className="text-5xl md:text-7xl font-black" style={{ color: '#C4D600' }}>
+                  ₱55,000
+                </p>
               </div>
 
-              <p className="text-white text-lg mb-4 uppercase font-semibold">
-                LESS THAN U$ 5 EACH PROJECT
-              </p>
-
-              <p className="text-sm text-gray-400 mb-8">
-                [ This offer is for a limited time only, AT ANY TIME THE PRICE WILL RETURN TO U$ 97.00 ]
+              <p className="text-white text-base md:text-lg mb-10 tracking-widest font-semibold border-y border-white/20 py-4 opacity-90 uppercase">
+                INCLUDES FLOOR PLANS, ELEVATIONS, AND 3D RENDERS
               </p>
 
               <Button
                 onClick={handlePurchase}
-                className="w-full text-xl py-6 font-bold rounded-full mb-6 transition-all duration-300 hover:scale-105"
+                className="w-full md:w-auto px-12 text-xl py-8 font-black rounded-none transition-all duration-300 hover:bg-white hover:text-black hover:tracking-[0.1em]"
                 style={{ backgroundColor: '#C4D600', color: '#000' }}
               >
-                YES, I WANT TO TAKE ADVANTAGE NOW
+                GET A FREE QUOTE
               </Button>
-
-              <div className="space-y-2 text-left">
-                <p className="text-white flex items-center gap-2">
-                  <span>👉</span> Immediate access after payment
-                </p>
-                <p className="text-white flex items-center gap-2">
-                  <span>📥</span> Files ready for download
-                </p>
-              </div>
             </CardContent>
           </Card>
 
@@ -730,11 +722,10 @@ const HomePage = () => {
           <div className="text-center mt-12">
             <Button
               onClick={handlePurchase}
-              className="text-xl py-6 px-12 font-bold rounded-full transition-all duration-300 hover:scale-105"
+              className="text-xl py-6 px-12 font-bold rounded-full transition-all duration-300 hover:scale-110"
               style={{ backgroundColor: '#C4D600', color: '#000' }}
             >
-              <Download className="mr-2" />
-              DOWNLOAD THIS PROJECT
+              GET A FREE QUOTE
             </Button>
           </div>
         </div>

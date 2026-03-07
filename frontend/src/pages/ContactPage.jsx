@@ -144,7 +144,7 @@ const ContactPage = () => {
           </div>
 
           {/* Contact Form */}
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-3xl mx-auto" id="contact-form">
             <Card className="bg-zinc-900 border-2 border-zinc-800">
               <CardContent className="p-8">
                 <h2 className="text-3xl font-black text-white mb-6 text-center">
