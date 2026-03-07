@@ -9,3 +9,7 @@
 ## 2024-05-23 - Carousel Mobile & Auto-Play Enhancements
 **Learning:** Carousels on mobile that rely solely on small navigation arrows provide a poor UX, as users naturally expect to swipe between images. Additionally, static carousels without auto-play can cause users to miss out on content hidden behind the first slide. Auto-play needs to pause on hover/focus to remain accessible.
 **Action:** Always implement touch event handlers (`onTouchStart`, `onTouchMove`, `onTouchEnd`) for swipe gestures on carousels to improve mobile UX. Introduce auto-play with a `setInterval` to encourage discovery, but strictly ensure the interval is cleared when the carousel is hovered or focused to respect user control and accessibility guidelines.
+
+## 2024-05-27 - Form Input and Label Accessibility
+**Learning:** Found a pattern of missing `id` attributes on form inputs and corresponding `htmlFor` attributes on their labels. This makes forms difficult to use for screen reader users, and also reduces the clickable area for all users since clicking the label doesn't focus the input.
+**Action:** Always verify that form inputs have a unique `id` and their associated label uses the `htmlFor` attribute pointing to that `id`. Additionally, adding `cursor-pointer` to labels improves discoverability of this interaction.
