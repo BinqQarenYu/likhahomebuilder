@@ -408,26 +408,26 @@ const HomePage = () => {
           <div className="mb-12 w-full overflow-visible">
             <ImageCarousel
               images={[
-                '/carousel/lowres/122.jpg',
-                '/carousel/lowres/123.jpg',
-                '/carousel/lowres/124.jpg',
-                '/carousel/lowres/126.jpg',
-                '/carousel/lowres/126A.jpg',
-                '/carousel/lowres/128A.jpg',
-                '/carousel/lowres/128B.jpg',
-                '/carousel/lowres/128D.jpg',
-                '/carousel/lowres/129A.jpg',
-                '/carousel/lowres/129C.jpg',
-                '/carousel/lowres/130A.jpg',
-                '/carousel/lowres/130B.jpg',
-                '/carousel/lowres/130C.jpg',
-                '/carousel/lowres/131A.jpg',
-                '/carousel/lowres/131B.jpg',
-                '/carousel/lowres/131C.jpg',
-                '/carousel/lowres/132A.jpg',
-                '/carousel/lowres/132B.jpg',
-                '/carousel/lowres/file_1772370111389.jpg',
-                '/carousel/lowres/file_1772370122487.jpg'
+                `${process.env.PUBLIC_URL}/carousel/lowres/122.jpg`,
+                `${process.env.PUBLIC_URL}/carousel/lowres/123.jpg`,
+                `${process.env.PUBLIC_URL}/carousel/lowres/124.jpg`,
+                `${process.env.PUBLIC_URL}/carousel/lowres/126.jpg`,
+                `${process.env.PUBLIC_URL}/carousel/lowres/126A.jpg`,
+                `${process.env.PUBLIC_URL}/carousel/lowres/128A.jpg`,
+                `${process.env.PUBLIC_URL}/carousel/lowres/128B.jpg`,
+                `${process.env.PUBLIC_URL}/carousel/lowres/128D.jpg`,
+                `${process.env.PUBLIC_URL}/carousel/lowres/129A.jpg`,
+                `${process.env.PUBLIC_URL}/carousel/lowres/129C.jpg`,
+                `${process.env.PUBLIC_URL}/carousel/lowres/130A.jpg`,
+                `${process.env.PUBLIC_URL}/carousel/lowres/130B.jpg`,
+                `${process.env.PUBLIC_URL}/carousel/lowres/130C.jpg`,
+                `${process.env.PUBLIC_URL}/carousel/lowres/131A.jpg`,
+                `${process.env.PUBLIC_URL}/carousel/lowres/131B.jpg`,
+                `${process.env.PUBLIC_URL}/carousel/lowres/131C.jpg`,
+                `${process.env.PUBLIC_URL}/carousel/lowres/132A.jpg`,
+                `${process.env.PUBLIC_URL}/carousel/lowres/132B.jpg`,
+                `${process.env.PUBLIC_URL}/carousel/lowres/file_1772370111389.jpg`,
+                `${process.env.PUBLIC_URL}/carousel/lowres/file_1772370122487.jpg`
               ]}
             />
           </div>
