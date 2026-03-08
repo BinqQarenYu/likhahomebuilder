@@ -1,6 +1,7 @@
 from fastapi import FastAPI, APIRouter
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 import os
 import logging
 from pathlib import Path
@@ -13,6 +14,32 @@ load_dotenv(ROOT_DIR / '.env')
 
 # Create the main app without a prefix
 app = FastAPI(title="Likha Home Builders API", version="1.0.0")
+
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+
+        # Content Security Policy
+        # Allowing Unsplash/Pexels for images, Facebook for frames/scripts,
+        # and jsdelivr for Swagger UI assets as per project requirements.
+        csp_directives = [
+            "default-src 'self'",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://connect.facebook.net",
+            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+            "img-src 'self' data: https://images.unsplash.com https://images.pexels.com",
+            "frame-src 'self' https://www.facebook.com https://web.facebook.com",
+            "connect-src 'self'",
+        ]
+        response.headers["Content-Security-Policy"] = "; ".join(csp_directives)
+        return response
+
+
+app.add_middleware(SecurityHeadersMiddleware)
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
