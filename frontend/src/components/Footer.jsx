@@ -61,12 +61,15 @@ const Footer = () => {
 
           <form onSubmit={handleNewsletterSubmit} className="max-w-md mx-auto flex gap-3">
             <Input
+              id="newsletter-email"
               type="email"
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="bg-black border-zinc-700 text-white"
               disabled={loading}
+              aria-label="Email address for newsletter"
+              required
             />
             <Button
               type="submit"
