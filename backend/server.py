@@ -1,4 +1,5 @@
 from fastapi import FastAPI, APIRouter
+from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 import os
@@ -33,6 +34,11 @@ api_router.include_router(purchase.router)
 
 # Include the router in the main app
 app.include_router(api_router)
+
+# Mount static files for carousel images
+carousel_dir = ROOT_DIR.parent / "frontend" / "public" / "carousel"
+if carousel_dir.exists():
+    app.mount("/carousel", StaticFiles(directory=str(carousel_dir)), name="carousel")
 
 # Configure CORS - Get from environment variable or use defaults
 # In production, ALLOWED_ORIGINS should be set in the .env file

@@ -19,6 +19,10 @@ const ImageCarousel = ({ images }) => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [mouseY, setMouseY] = useState(0);
 
+  // Lightbox State
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
   // Velocity Navigation State
   const [dragStart, setDragStart] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
@@ -42,7 +46,7 @@ const ImageCarousel = ({ images }) => {
 
   // Auto-play Logic (4 seconds)
   React.useEffect(() => {
-    if (isHovered || isDragging) return;
+    if (isHovered || isDragging || lightboxOpen) return;
     const interval = setInterval(() => {
       setTransitionDuration(600);
       handleNext();
@@ -113,6 +117,24 @@ const ImageCarousel = ({ images }) => {
     const percentY = (y / rect.height) * 2 - 1; // -1 to 1
     setMouseY(percentY);
   };
+
+  // Keyboard Navigation for Lightbox
+  React.useEffect(() => {
+    if (!lightboxOpen) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setLightboxOpen(false);
+      } else if (e.key === 'ArrowLeft') {
+        setLightboxIndex((prev) => (prev - 1 + imagesCount) % imagesCount);
+      } else if (e.key === 'ArrowRight') {
+        setLightboxIndex((prev) => (prev + 1) % imagesCount);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightboxOpen, imagesCount]);
 
   const getImageStyles = (index) => {
     let diff = index - currentIndex;
@@ -220,6 +242,9 @@ const ImageCarousel = ({ images }) => {
               if (Math.abs(distance) >= 1 && Math.abs(distance) <= 2) {
                 setTransitionDuration(400);
                 setCurrentIndex(i);
+              } else if (i === currentIndex) {
+                setLightboxIndex(i);
+                setLightboxOpen(true);
               }
             }}
           >
@@ -274,6 +299,58 @@ const ImageCarousel = ({ images }) => {
       {/* Decorative Gradient Overlay for Depth */}
       <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black to-transparent pointer-events-none" />
       <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent pointer-events-none" />
+
+      {/* Lightbox Overlay */}
+      {lightboxOpen && (
+        <div
+          className="fixed inset-0 z-[999] bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm"
+          onClick={() => setLightboxOpen(false)}
+        >
+          <button
+            className="absolute top-6 right-6 text-white hover:text-[#C4D600] z-50 transition-colors"
+            onClick={() => setLightboxOpen(false)}
+            aria-label="Close lightbox"
+          >
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          <button
+            className="absolute left-6 text-white hover:text-[#C4D600] z-50 p-2 transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              setLightboxIndex((prev) => (prev - 1 + imagesCount) % imagesCount);
+            }}
+            aria-label="Previous image"
+          >
+            <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          <div className="relative w-full max-w-5xl h-full max-h-[85vh] flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={images[lightboxIndex].replace('/lowres/', '/highres/')}
+              alt={`Project full view ${lightboxIndex + 1}`}
+              className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+            />
+          </div>
+
+          <button
+            className="absolute right-6 text-white hover:text-[#C4D600] z-50 p-2 transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              setLightboxIndex((prev) => (prev + 1) % imagesCount);
+            }}
+            aria-label="Next image"
+          >
+            <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      )}
     </div>
   );
 };
