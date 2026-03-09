@@ -43,10 +43,10 @@ $backendJob = Start-Job -ScriptBlock {
     param($path) 
     Set-Location "$path\backend"
     if (Get-Command py -ErrorAction SilentlyContinue) {
-        py -m uvicorn server:app --host 0.0.0.0 --port 8000
+        py -m uvicorn server:app --host 0.0.0.0 --port 8000 > "$path\backend_new.log" 2>&1
     }
     else {
-        uvicorn server:app --host 0.0.0.0 --port 8000
+        uvicorn server:app --host 0.0.0.0 --port 8000 > "$path\backend_new.log" 2>&1
     }
 } -ArgumentList $scriptRoot -Name "LikhaBackend"
 
@@ -67,7 +67,7 @@ $frontendJob = Start-Job -ScriptBlock {
     $env:REACT_APP_BACKEND_URL = "http://localhost:8000/api"
     $env:BROWSER = "none"
     $env:CI = "true"
-    npm start
+    npm.cmd start > "$path\frontend_new.log" 2>&1
 } -ArgumentList $scriptRoot -Name "LikhaFrontend"
 
 Write-Host "`nApp attempts started!"
