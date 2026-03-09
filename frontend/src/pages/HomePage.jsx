@@ -25,7 +25,10 @@ const ImageCarousel = ({ images }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [mouseY, setMouseY] = useState(0);
-  const [selectedImage, setSelectedImage] = useState(null);
+
+  // Lightbox State
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   // Velocity Navigation State
   const [dragStart, setDragStart] = useState(0);
@@ -50,13 +53,13 @@ const ImageCarousel = ({ images }) => {
 
   // Auto-play Logic (4 seconds)
   React.useEffect(() => {
-    if (isHovered || isDragging || selectedImage) return;
+    if (isHovered || isDragging || lightboxOpen) return;
     const interval = setInterval(() => {
       setTransitionDuration(600);
       handleNext();
     }, 4000);
     return () => clearInterval(interval);
-  }, [currentIndex, isHovered, isDragging, selectedImage]);
+  }, [currentIndex, isHovered, isDragging, lightboxOpen]);
 
   const handleStart = (clientX) => {
     setDragStart(clientX);
@@ -121,6 +124,24 @@ const ImageCarousel = ({ images }) => {
     const percentY = (y / rect.height) * 2 - 1; // -1 to 1
     setMouseY(percentY);
   };
+
+  // Keyboard Navigation for Lightbox
+  React.useEffect(() => {
+    if (!lightboxOpen) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setLightboxOpen(false);
+      } else if (e.key === 'ArrowLeft') {
+        setLightboxIndex((prev) => (prev - 1 + imagesCount) % imagesCount);
+      } else if (e.key === 'ArrowRight') {
+        setLightboxIndex((prev) => (prev + 1) % imagesCount);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightboxOpen, imagesCount]);
 
   const handleImageError = (e) => {
     e.target.src = 'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?q=80&w=2074&auto=format&fit=crop';
@@ -231,7 +252,8 @@ const ImageCarousel = ({ images }) => {
                 const diff = (i - currentIndex + imagesCount) % imagesCount;
                 const distance = diff > imagesCount / 2 ? diff - imagesCount : diff;
                 if (distance === 0) {
-                  setSelectedImage(img.replace('/lowres/', '/highres/'));
+                  setLightboxIndex(i);
+                  setLightboxOpen(true);
                 } else if (Math.abs(distance) <= 2) {
                   setTransitionDuration(400);
                   setCurrentIndex(i);
@@ -244,6 +266,7 @@ const ImageCarousel = ({ images }) => {
                 className="w-full h-full object-cover select-none pointer-events-none"
                 loading={Math.min(Math.abs(i - currentIndex), imagesCount - Math.abs(i - currentIndex)) <= 2 ? "eager" : "lazy"}
                 decoding="async"
+                fetchpriority={i === currentIndex ? "high" : "auto"}
                 onError={handleImageError}
               />
             </div>
@@ -272,9 +295,8 @@ const ImageCarousel = ({ images }) => {
                     setTransitionDuration(400);
                     setCurrentIndex(i);
                   }}
-                  className={`transition-all duration-300 rounded-full focus-visible:ring-2 focus-visible:ring-[#C4D600] outline-none ${
-                    i === currentIndex ? 'w-8 h-1.5 bg-[#C4D600]' : 'w-1.5 h-1.5 bg-white/20'
-                  }`}
+                  className={`transition-all duration-300 rounded-full focus-visible:ring-2 focus-visible:ring-[#C4D600] outline-none ${i === currentIndex ? 'w-8 h-1.5 bg-[#C4D600]' : 'w-1.5 h-1.5 bg-white/20'
+                    }`}
                   aria-label={`Go to slide ${i + 1}`}
                 />
               ))}
@@ -297,17 +319,45 @@ const ImageCarousel = ({ images }) => {
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent pointer-events-none" />
       </div>
 
-      {/* Lightbox Modal */}
-      <Dialog open={!!selectedImage} onOpenChange={(open) => !open && setSelectedImage(null)}>
-        <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-transparent border-none flex items-center justify-center outline-none shadow-none">
+      {/* Lightbox Modal (Radix UI) */}
+      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-transparent border-none flex items-center justify-center outline-none shadow-none z-[1000]">
           <DialogTitle className="sr-only">Project High-Resolution View</DialogTitle>
-          <div className="relative group w-full h-full flex items-center justify-center">
-             <img
-              src={selectedImage}
-              alt="Expanded view"
-              className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl transition-transform duration-300 touch-pinch-zoom"
+          <div className="relative group w-full h-full flex items-center justify-center h-[90vh]">
+            {/* Navigation Arrows */}
+            <button
+              className="absolute left-6 text-white hover:text-[#C4D600] z-50 p-2 transition-colors bg-black/20 rounded-full backdrop-blur-sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                setLightboxIndex((prev) => (prev - 1 + imagesCount) % imagesCount);
+              }}
+              aria-label="Previous image"
+            >
+              <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            <img
+              src={images[lightboxIndex].replace('/lowres/', '/highres/')}
+              alt={`Project full view ${lightboxIndex + 1}`}
+              className="max-w-full max-h-full object-contain rounded-lg shadow-2xl transition-transform duration-300 touch-pinch-zoom"
               onError={handleImageError}
             />
+
+            <button
+              className="absolute right-6 text-white hover:text-[#C4D600] z-50 p-2 transition-colors bg-black/20 rounded-full backdrop-blur-sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                setLightboxIndex((prev) => (prev + 1) % imagesCount);
+              }}
+              aria-label="Next image"
+            >
+              <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
             <DialogClose className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-black/80 text-white rounded-full transition-all outline-none border border-white/20">
               <X className="w-6 h-6" />
               <span className="sr-only">Close</span>
@@ -610,10 +660,10 @@ const HomePage = () => {
             ))}
           </div>
         </div>
-      </section >
+      </section>
 
       {/* Why Perfect */}
-      < section className="py-16 px-4" >
+      <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-black text-center mb-12 text-white">
             Why Is This Package Perfect For You?
@@ -627,10 +677,10 @@ const HomePage = () => {
             ))}
           </div>
         </div>
-      </section >
+      </section>
 
       {/* Bonuses Section */}
-      < section className="py-16 px-4 bg-zinc-900" >
+      <section className="py-16 px-4 bg-zinc-900">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-black text-center mb-4" style={{ color: '#C4D600' }}>
             🎁 EXCLUSIVE BONUSES FOR PEOPLE TO BUY TODAY:
@@ -641,7 +691,6 @@ const HomePage = () => {
               <Card key={bonus.id} className="bg-black border-2 border-white rounded-3xl overflow-hidden">
                 <CardContent className="p-0">
                   <div className="relative h-48 overflow-hidden">
-                    {/* ⚡ Bolt: Lazy load below-the-fold images */}
                     <img
                       src={bonus.image}
                       alt={bonus.title}
@@ -654,131 +703,82 @@ const HomePage = () => {
                     <h3 className="text-2xl font-black mb-2" style={{ color: '#C4D600' }}>
                       {bonus.title}
                     </h3>
-                    <p className="text-white text-base mb-4">{bonus.subtitle}</p>
-                    <p className="text-gray-400 text-sm">
-                      ( U$ <span className="line-through">{bonus.originalPrice}</span> por U$ 0,00 )
-                    </p>
+                    <p className="text-white text-lg mb-4 font-bold">{bonus.subtitle}</p>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
-
-          <div className="text-center mt-8">
-            <p className="text-xl text-white font-semibold">Bonus Value:</p>
-            <p className="text-2xl text-gray-400">
-              ( De U$ <span className="line-through">197</span> por U$ 0,00 )
-            </p>
-          </div>
         </div>
-      </section >
+      </section>
 
-      {/* Urgency Section */}
-      < section className="py-16 px-4" >
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="bg-zinc-900/50 border-2 border-[#C4D600]/30 rounded-3xl p-8 mb-8">
-            <h2 className="text-3xl md:text-4xl font-black text-white mb-4">
-              Step Into Your Future Home
-            </h2>
-            <p className="text-xl text-gray-300 mb-4">
-              We provide more than just designs; we deliver complete, construction-ready blueprints paired with detailed material and labor estimates.
-            </p>
-            <p className="text-xl text-white font-medium">
-              ✅ Get everything you need to start construction immediately—from structural steel specifications to professional cost projections that keep your investment secure.
-            </p>
-          </div>
+      {/* FAQ Section */}
+      <section className="py-16 px-4">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-black text-center mb-12 text-white">
+            Frequently Asked Questions
+          </h2>
+          <Accordion type="single" collapsible className="w-full">
+            {faqs.map((faq, index) => (
+              <AccordionItem key={index} value={`item-${index}`} className="border-white/20">
+                <AccordionTrigger className="text-left text-lg font-bold hover:text-[#C4D600] py-6">
+                  {faq.question}
+                </AccordionTrigger>
+                <AccordionContent className="text-gray-300 text-lg py-4">
+                  {faq.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+      </section>
 
-          <div className="mb-8">
-            {/* ⚡ Bolt: Lazy load below-the-fold images */}
-            <img
-              src="https://images.pexels.com/photos/12610487/pexels-photo-12610487.jpeg"
-              alt="Limited Offer"
-              className="w-full h-64 object-cover rounded-2xl"
-              loading="lazy"
-              onError={(e) => e.target.src = 'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?q=80&w=2074&auto=format&fit=crop'}
-            />
-          </div>
+      {/* Final CTA */}
+      <section className="py-24 px-4 bg-[#C4D600]">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl md:text-5xl font-black text-black mb-12 uppercase">
+            Step Into Your Future Home
+          </h2>
+          <p className="text-black text-xl mb-12 font-bold max-w-2xl mx-auto">
+            We provide more than just designs; we deliver complete, construction-ready blueprints paired with detailed material and labor estimates.
+            <br /><br />
+            ✅ Get everything you need to start construction immediately—from structural steel specifications to professional cost projections that keep your investment secure.
+          </p>
 
-          <Card className="bg-black border-2 border-white rounded-3xl overflow-hidden mb-8">
+          <Card className="bg-black border-4 border-black rounded-none overflow-hidden max-w-xl mx-auto group hover:scale-105 transition-transform duration-500">
             <CardContent className="p-10 text-center">
-              <h3 className="text-3xl md:text-5xl font-black text-white mb-4 uppercase">
+              <h3 className="text-2xl md:text-3xl font-black text-white mb-4 uppercase">
                 Complete Architectural Design
               </h3>
-              <p className="text-[#C4D600] text-lg mb-10 tracking-[0.2em] font-bold">
+              <p className="text-[#C4D600] text-sm mb-8 tracking-[0.2em] font-bold">
                 FULL BLUEPRINTS & 3D VISUALIZATION
               </p>
 
-              <div className="mb-10 text-center">
-                <p className="text-white text-lg opacity-80 mb-2 font-medium">Starting at</p>
-                <p className="text-5xl md:text-7xl font-black" style={{ color: '#C4D600' }}>
+              <div className="mb-8">
+                <p className="text-white text-sm opacity-80 mb-1">Starting at</p>
+                <p className="text-5xl md:text-6xl font-black" style={{ color: '#C4D600' }}>
                   ₱55,000
                 </p>
               </div>
 
-              <p className="text-white text-base md:text-lg mb-10 tracking-widest font-semibold border-y border-white/20 py-4 opacity-90 uppercase">
+              <p className="text-white text-xs md:text-sm mb-8 tracking-widest font-semibold border-y border-white/20 py-3 opacity-90 uppercase">
                 INCLUDES FLOOR PLANS, ELEVATIONS, AND 3D RENDERS
               </p>
 
               <Button
                 onClick={handlePurchase}
-                className="w-full md:w-auto px-12 text-xl py-8 font-black rounded-none transition-all duration-300 hover:bg-white hover:text-black hover:tracking-[0.1em]"
+                className="w-full md:w-auto px-10 text-lg py-7 font-black rounded-none transition-all duration-300 hover:bg-white hover:text-black"
                 style={{ backgroundColor: '#C4D600', color: '#000' }}
               >
                 GET A FREE QUOTE
               </Button>
             </CardContent>
           </Card>
-
-          <div className="mb-8">
-            {/* ⚡ Bolt: Lazy load below-the-fold images */}
-            <img
-              src="https://via.placeholder.com/300x60/000000/FFFFFF?text=Secure+Payment"
-              alt="Payment Methods"
-              className="mx-auto h-16 object-contain"
-              loading="lazy"
-            />
-          </div>
         </div>
-      </section >
-
-      {/* FAQ Section */}
-      < section className="py-16 px-4 bg-zinc-900" >
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-black text-center mb-12 text-white">
-            Frequently Asked Questions
-          </h2>
-
-          <Accordion type="single" collapsible className="space-y-4">
-            {faqs.map((faq, index) => (
-              <AccordionItem
-                key={index}
-                value={`item-${index}`}
-                className="bg-black border-2 border-white rounded-2xl px-6 data-[state=open]:border-[#C4D600]"
-              >
-                <AccordionTrigger className="text-left text-lg font-bold text-white hover:no-underline">
-                  {faq.question}
-                </AccordionTrigger>
-                <AccordionContent className="text-gray-300 text-base">
-                  {faq.answer}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-
-          <div className="text-center mt-12">
-            <Button
-              onClick={handlePurchase}
-              className="text-xl py-6 px-12 font-bold rounded-full transition-all duration-300 hover:scale-110"
-              style={{ backgroundColor: '#C4D600', color: '#000' }}
-            >
-              GET A FREE QUOTE
-            </Button>
-          </div>
-        </div>
-      </section >
+      </section>
 
       <Footer />
-    </div >
+    </div>
   );
 };
 
