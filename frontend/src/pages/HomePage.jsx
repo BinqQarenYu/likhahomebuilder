@@ -576,11 +576,14 @@ const HomePage = () => {
       <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-              ✅ What You Will Receive:
+            <h3 className="text-[#C4D600] text-lg font-black tracking-widest uppercase mb-2">
+              The "Elite Standard"
+            </h3>
+            <h2 className="text-3xl md:text-5xl font-black text-white mb-8">
+              The Definitive Blueprint for Modern Living.
             </h2>
-            <p className="text-gray-300 text-lg max-w-4xl mx-auto">
-              When you buy today, you get four projects ready for immediate construction, with a total focus on low costs, fast execution, and high profitability for rental on platforms like Airbnb.
+            <p className="text-gray-300 text-lg md:text-xl max-w-4xl mx-auto leading-relaxed">
+              We have distilled our expertise into a single, master-tier project ready for immediate construction. Moving beyond simple packages, we now offer our most versatile design—engineered for rapid execution and low overhead without compromising on architectural soul. Whether you are building a private sanctuary or a high-yield investment.
             </p>
           </div>
         </div>
