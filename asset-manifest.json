@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/likhahomebuilder/static/css/main.a88919b5.css",
-    "main.js": "/likhahomebuilder/static/js/main.c5b86269.js",
+    "main.js": "/likhahomebuilder/static/js/main.9d94ee88.js",
     "index.html": "/likhahomebuilder/index.html",
     "main.a88919b5.css.map": "/likhahomebuilder/static/css/main.a88919b5.css.map",
-    "main.c5b86269.js.map": "/likhahomebuilder/static/js/main.c5b86269.js.map"
+    "main.9d94ee88.js.map": "/likhahomebuilder/static/js/main.9d94ee88.js.map"
   },
   "entrypoints": [
     "static/css/main.a88919b5.css",
-    "static/js/main.c5b86269.js"
+    "static/js/main.9d94ee88.js"
   ]
 }
