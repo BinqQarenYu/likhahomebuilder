@@ -107,13 +107,13 @@ const AboutPage = () => {
             {values.map((value, index) => {
               const Icon = value.icon;
               return (
-                <Card key={index} className="bg-zinc-900 border-zinc-800 hover:border-[#C4D600] transition-all duration-300">
-                  <CardContent className="p-6 text-center">
-                    <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: '#C4D600' }}>
-                      <Icon className="w-8 h-8 text-black" />
+                <Card key={index} className="bg-zinc-900/60 backdrop-blur-xl border-white/10 hover:border-[#C4D600] hover:shadow-[0_0_30px_rgba(196,214,0,0.35)] transition-all duration-500 group flex flex-col h-full">
+                  <CardContent className="p-8 flex-1 flex flex-col items-center text-center">
+                    <div className="w-14 h-14 rounded-full mx-auto mb-6 flex items-center justify-center transition-transform duration-500 group-hover:-translate-y-1.5" style={{ backgroundColor: '#C4D600' }}>
+                      <Icon className="w-7 h-7 text-black" />
                     </div>
-                    <h3 className="text-white font-bold text-xl mb-3">{value.title}</h3>
-                    <p className="text-gray-400 text-sm leading-relaxed">{value.description}</p>
+                    <h3 className="text-white font-serif italic text-2xl mb-4">{value.title}</h3>
+                    <p className="text-gray-400 group-hover:text-gray-200 transition-colors duration-500 text-base leading-relaxed">{value.description}</p>
                   </CardContent>
                 </Card>
               );
@@ -193,7 +193,7 @@ const AboutPage = () => {
               { name: 'Roy Pailma', role: 'Chief of Operation', description: 'Expert in project execution and operational management' },
             ].map((member, index) => (
               <Card key={index} className="bg-black border-zinc-800">
-                <CardContent className="p-6 text-center">
+                <CardContent className="p-8 flex-1 flex flex-col items-center text-center">
                   <div className="w-24 h-24 rounded-full mx-auto mb-4" style={{ backgroundColor: '#C4D600' }}></div>
                   <h3 className="text-white font-bold text-xl mb-1">{member.name}</h3>
                   <p className="text-[#C4D600] font-semibold mb-3">{member.role}</p>
