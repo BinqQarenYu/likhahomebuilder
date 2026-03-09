@@ -428,7 +428,7 @@ const HomePage = () => {
       id: 1,
       title: 'Bonus #1',
       subtitle: 'Construction checklists and supplier suggestions',
-      image: 'https://images.unsplash.com/photo-1744235558674-89a6ed881268',
+      image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=2070&auto=format&fit=crop',
       originalPrice: '65,00',
     },
     {
