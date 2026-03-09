@@ -87,7 +87,7 @@ const Header = () => {
           {/* Contact Info - Desktop */}
           <div className="hidden lg:flex items-center gap-6">
             <a
-              href="tel:+639193944262"
+              href="https://wa.me/639193944262"
               className="flex items-center gap-2 text-sm text-white hover:text-[#C4D600] transition-colors"
             >
               <Phone className="w-4 h-4" />
@@ -126,7 +126,7 @@ const Header = () => {
                 ))}
                 <div className="border-t border-zinc-800 pt-6 space-y-4">
                   <a
-                    href="tel:+639193944262"
+                    href="https://wa.me/639193944262"
                     className="flex items-center gap-2 text-sm text-white"
                   >
                     <Phone className="w-4 h-4" />

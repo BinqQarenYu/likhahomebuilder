@@ -81,8 +81,8 @@ const ContactPage = () => {
     {
       icon: Phone,
       title: 'Phone Number',
-      content: '+63 919 324 4262',
-      link: 'tel:+639193244262',
+      content: '+63 919 394 4262',
+      link: 'https://wa.me/639193944262',
     },
     {
       icon: Mail,

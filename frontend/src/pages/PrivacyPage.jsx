@@ -109,7 +109,7 @@ const PrivacyPage = () => {
             </p>
             <div className="ml-4 space-y-2">
               <p>Email: ArchitectReign@likhahome.com</p>
-              <p>Phone: +63 919 324 4262</p>
+              <p>Phone: <a href="https://wa.me/639193944262" className="hover:text-[#C4D600] transition-colors">+63 919 394 4262</a></p>
               <p>Address: 123 Construction Ave, Building District, Manila 1234, Philippines</p>
             </div>
           </section>
