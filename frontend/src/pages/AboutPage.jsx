@@ -189,7 +189,7 @@ const AboutPage = () => {
             {[
               { name: 'Architect Elizabeth Cariño', role: 'Founder and Architect', description: 'Head of Design' },
               { name: 'Reigneth G. Villena', role: 'Founder & Architect', description: 'Licensed Architect specializing in sustainable modular design' },
-              { name: 'Benjohn U. Carino', role: 'Chief Executive Officer', description: 'Expert in modular construction and project management' },
+              { name: 'Jess Carino', role: 'Chief Executive Officer', description: 'Expert in modular construction and project management' },
               { name: 'Roy Pailma', role: 'Chief of Operation', description: 'Expert in project execution and operational management' },
             ].map((member, index) => (
               <Card key={index} className="bg-black border-zinc-800">
