@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, Download } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import {
   Accordion,
@@ -9,6 +9,13 @@ import {
   AccordionTrigger,
 } from '../components/ui/accordion';
 import { Card, CardContent } from '../components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogClose,
+  DialogTitle,
+} from '../components/ui/dialog';
 import { useToast } from '../hooks/use-toast';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -18,6 +25,7 @@ const ImageCarousel = ({ images }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [mouseY, setMouseY] = useState(0);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   // Velocity Navigation State
   const [dragStart, setDragStart] = useState(0);
@@ -42,13 +50,13 @@ const ImageCarousel = ({ images }) => {
 
   // Auto-play Logic (4 seconds)
   React.useEffect(() => {
-    if (isHovered || isDragging) return;
+    if (isHovered || isDragging || selectedImage) return;
     const interval = setInterval(() => {
       setTransitionDuration(600);
       handleNext();
     }, 4000);
     return () => clearInterval(interval);
-  }, [currentIndex, isHovered, isDragging]);
+  }, [currentIndex, isHovered, isDragging, selectedImage]);
 
   const handleStart = (clientX) => {
     setDragStart(clientX);
@@ -114,6 +122,10 @@ const ImageCarousel = ({ images }) => {
     setMouseY(percentY);
   };
 
+  const handleImageError = (e) => {
+    e.target.src = 'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?q=80&w=2074&auto=format&fit=crop';
+  };
+
   const getImageStyles = (index) => {
     let diff = index - currentIndex;
     if (diff > imagesCount / 2) diff -= imagesCount;
@@ -132,15 +144,15 @@ const ImageCarousel = ({ images }) => {
     let boxShadow = '0 20px 50px rgba(0,0,0,0.8)';
 
     if (absDiff === 0) {
-      scale = 1.1;
+      scale = 1.15; // Slightly larger center
       rotateY = 0;
       opacity = 1;
       zIndex = 50;
       translateX = 0;
-      // Active State Glow
+      // Branded Glow
       boxShadow = isThisHovered
-        ? '0 0 40px rgba(255,255,255,0.3), 0 20px 50px rgba(0,0,0,0.8)'
-        : '0 0 20px rgba(255,255,255,0.1), 0 20px 50px rgba(0,0,0,0.8)';
+        ? '0 0 50px rgba(196,214,0,0.4), 0 20px 50px rgba(0,0,0,0.8)'
+        : '0 0 20px rgba(196,214,0,0.2), 0 20px 50px rgba(0,0,0,0.8)';
     } else if (absDiff === 1) {
       scale = 0.9;
       rotateY = diff > 0 ? -15 : 15;
@@ -163,7 +175,7 @@ const ImageCarousel = ({ images }) => {
     if (isThisHovered && !isDragging) {
       scale += 0.05; // Hover Lift
       zIndex += 10;  // Boost Depth
-      rotateX = -mouseY * 5; // 3D Tilt
+      rotateX = -mouseY * 8; // 3D Tilt
     }
 
     return {
@@ -172,10 +184,10 @@ const ImageCarousel = ({ images }) => {
       opacity: opacity,
       boxShadow: boxShadow,
       transition: isThisHovered && !isDragging
-        ? 'transform 200ms ease-out, opacity 600ms, box-shadow 200ms'
+        ? 'transform 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 600ms, box-shadow 300ms'
         : `transform ${transitionDuration}ms cubic-bezier(0.4, 0, 0.2, 1), opacity 600ms, z-index 600ms, box-shadow 600ms`,
       pointerEvents: absDiff <= 2 ? 'auto' : 'none',
-      cursor: isCenter ? (isDragging ? 'grabbing' : 'grab') : 'pointer',
+      cursor: isCenter ? 'zoom-in' : 'pointer',
       backfaceVisibility: 'hidden',
       WebkitBackfaceVisibility: 'hidden',
       transformStyle: 'preserve-3d',
@@ -183,98 +195,127 @@ const ImageCarousel = ({ images }) => {
   };
 
   return (
-    <div
-      className="relative w-full h-[450px] md:h-[600px] flex items-center justify-center overflow-hidden [perspective:1200px] bg-black select-none"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => {
-        setIsHovered(false);
-        setHoveredIndex(null);
-        setMouseY(0);
-      }}
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
-      onMouseDown={onMouseDown}
-    >
+    <>
       <div
-        className="relative w-[180px] md:w-[260px] h-[320px] md:h-[480px] [transform-style:preserve-3d] transition-transform duration-200"
-        style={{
-          transform: `rotateY(${dragOffset / 10}deg)`, // Visual Fan Tilt during drag
-          cursor: isDragging ? 'grabbing' : 'grab'
+        className="relative w-full h-[450px] md:h-[600px] flex items-center justify-center overflow-hidden [perspective:1200px] bg-black select-none"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => {
+          setIsHovered(false);
+          setHoveredIndex(null);
+          setMouseY(0);
         }}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        onMouseDown={onMouseDown}
       >
-        {images.map((img, i) => (
-          <div
-            key={i}
-            className="absolute inset-0 w-full h-full rounded-2xl overflow-hidden border border-white/10"
-            style={getImageStyles(i)}
-            onMouseEnter={() => setHoveredIndex(i)}
-            onMouseMove={(e) => handleFrameMouseMove(e, i)}
-            onMouseLeave={() => {
-              setHoveredIndex(null);
-              setMouseY(0);
-            }}
-            onClick={() => {
-              const diff = (i - currentIndex + imagesCount) % imagesCount;
-              const distance = diff > imagesCount / 2 ? diff - imagesCount : diff;
-              if (Math.abs(distance) >= 1 && Math.abs(distance) <= 2) {
-                setTransitionDuration(400);
-                setCurrentIndex(i);
-              }
-            }}
-          >
-            <img
-              src={img}
-              alt={`Project ${i + 1}`}
-              className="w-full h-full object-cover select-none pointer-events-none"
-              loading={Math.min(Math.abs(i - currentIndex), imagesCount - Math.abs(i - currentIndex)) <= 2 ? "eager" : "lazy"}
-              decoding="async"
-              fetchpriority={i === currentIndex ? "high" : "auto"}
-            />
-          </div>
-        ))}
-      </div>
-
-      {/* Modern Controls */}
-      <div className="absolute inset-0 pointer-events-none z-[110] flex items-end justify-center pb-8">
-        <div className="flex justify-center items-center gap-6 pointer-events-auto">
-          <button
-            onClick={() => handlePrev(1)}
-            className="p-3 bg-white/5 hover:bg-[#C4D600] text-white hover:text-black rounded-full transition-all border border-white/10 hover:border-[#C4D600] group"
-            aria-label="Previous"
-          >
-            <svg className="w-6 h-6 transform transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-
-          {/* Progress Indicators */}
-          <div className="flex gap-2">
-            {images.map((_, i) => (
-              <div
-                key={i}
-                className={`transition-all duration-300 rounded-full ${i === currentIndex ? 'w-8 h-1.5 bg-[#C4D600]' : 'w-1.5 h-1.5 bg-white/20'
-                  }`}
+        <div
+          className="relative w-[180px] md:w-[260px] h-[320px] md:h-[480px] [transform-style:preserve-3d] transition-transform duration-300"
+          style={{
+            transform: `rotateY(${dragOffset / 10}deg)`, // Visual Fan Tilt during drag
+            cursor: isDragging ? 'grabbing' : 'grab'
+          }}
+        >
+          {images.map((img, i) => (
+            <div
+              key={i}
+              className="absolute inset-0 w-full h-full rounded-2xl overflow-hidden border border-white/10"
+              style={getImageStyles(i)}
+              onMouseEnter={() => setHoveredIndex(i)}
+              onMouseMove={(e) => handleFrameMouseMove(e, i)}
+              onMouseLeave={() => {
+                setHoveredIndex(null);
+                setMouseY(0);
+              }}
+              onClick={() => {
+                const diff = (i - currentIndex + imagesCount) % imagesCount;
+                const distance = diff > imagesCount / 2 ? diff - imagesCount : diff;
+                if (distance === 0) {
+                  setSelectedImage(img.replace('/lowres/', '/highres/'));
+                } else if (Math.abs(distance) <= 2) {
+                  setTransitionDuration(400);
+                  setCurrentIndex(i);
+                }
+              }}
+            >
+              <img
+                src={img}
+                alt={`Project ${i + 1}`}
+                className="w-full h-full object-cover select-none pointer-events-none"
+                loading={Math.min(Math.abs(i - currentIndex), imagesCount - Math.abs(i - currentIndex)) <= 2 ? "eager" : "lazy"}
+                decoding="async"
+                onError={handleImageError}
               />
-            ))}
-          </div>
-
-          <button
-            onClick={() => handleNext(1)}
-            className="p-3 bg-white/5 hover:bg-[#C4D600] text-white hover:text-black rounded-full transition-all border border-white/10 hover:border-[#C4D600] group"
-            aria-label="Next"
-          >
-            <svg className="w-6 h-6 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+            </div>
+          ))}
         </div>
+
+        {/* Modern Controls */}
+        <div className="absolute inset-0 pointer-events-none z-[110] flex items-end justify-center pb-8">
+          <div className="flex justify-center items-center gap-6 pointer-events-auto">
+            <button
+              onClick={() => handlePrev(1)}
+              className="p-3 bg-white/5 hover:bg-[#C4D600] text-white hover:text-black rounded-full transition-all border border-white/10 hover:border-[#C4D600] group"
+              aria-label="Previous"
+            >
+              <svg className="w-6 h-6 transform transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            {/* Progress Indicators */}
+            <div className="flex gap-2">
+              {images.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setTransitionDuration(400);
+                    setCurrentIndex(i);
+                  }}
+                  className={`transition-all duration-300 rounded-full focus-visible:ring-2 focus-visible:ring-[#C4D600] outline-none ${
+                    i === currentIndex ? 'w-8 h-1.5 bg-[#C4D600]' : 'w-1.5 h-1.5 bg-white/20'
+                  }`}
+                  aria-label={`Go to slide ${i + 1}`}
+                />
+              ))}
+            </div>
+
+            <button
+              onClick={() => handleNext(1)}
+              className="p-3 bg-white/5 hover:bg-[#C4D600] text-white hover:text-black rounded-full transition-all border border-white/10 hover:border-[#C4D600] group"
+              aria-label="Next"
+            >
+              <svg className="w-6 h-6 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Decorative Gradient Overlay for Depth */}
+        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent pointer-events-none" />
       </div>
 
-      {/* Decorative Gradient Overlay for Depth */}
-      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black to-transparent pointer-events-none" />
-      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent pointer-events-none" />
-    </div>
+      {/* Lightbox Modal */}
+      <Dialog open={!!selectedImage} onOpenChange={(open) => !open && setSelectedImage(null)}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-transparent border-none flex items-center justify-center outline-none shadow-none">
+          <DialogTitle className="sr-only">Project High-Resolution View</DialogTitle>
+          <div className="relative group w-full h-full flex items-center justify-center">
+             <img
+              src={selectedImage}
+              alt="Expanded view"
+              className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl transition-transform duration-300 touch-pinch-zoom"
+              onError={handleImageError}
+            />
+            <DialogClose className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-black/80 text-white rounded-full transition-all outline-none border border-white/20">
+              <X className="w-6 h-6" />
+              <span className="sr-only">Close</span>
+            </DialogClose>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
@@ -543,6 +584,7 @@ const HomePage = () => {
                         alt={project.title}
                         className="absolute inset-0 w-full h-full object-cover"
                         loading="lazy"
+                        onError={(e) => e.target.src = 'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?q=80&w=2074&auto=format&fit=crop'}
                       />
                     </div>
                   )}
@@ -605,6 +647,7 @@ const HomePage = () => {
                       alt={bonus.title}
                       className="w-full h-full object-cover"
                       loading="lazy"
+                      onError={(e) => e.target.src = 'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?q=80&w=2074&auto=format&fit=crop'}
                     />
                   </div>
                   <div className="p-6">
@@ -652,6 +695,7 @@ const HomePage = () => {
               alt="Limited Offer"
               className="w-full h-64 object-cover rounded-2xl"
               loading="lazy"
+              onError={(e) => e.target.src = 'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?q=80&w=2074&auto=format&fit=crop'}
             />
           </div>
 
