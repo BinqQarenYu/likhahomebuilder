@@ -35,10 +35,19 @@ api_router.include_router(purchase.router)
 # Include the router in the main app
 app.include_router(api_router)
 
+from starlette.responses import Response
+
+class CachedStaticFiles(StaticFiles):
+    async def get_response(self, path: str, scope: dict) -> Response:
+        response = await super().get_response(path, scope)
+        if response.status_code == 200:
+            response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        return response
+
 # Mount static files for carousel images
 carousel_dir = ROOT_DIR.parent / "frontend" / "public" / "carousel"
 if carousel_dir.exists():
-    app.mount("/carousel", StaticFiles(directory=str(carousel_dir)), name="carousel")
+    app.mount("/carousel", CachedStaticFiles(directory=str(carousel_dir)), name="carousel")
 
 # Configure CORS - Get from environment variable or use defaults
 # In production, ALLOWED_ORIGINS should be set in the .env file
