@@ -590,7 +590,7 @@ const HomePage = () => {
       <section className="py-12 px-4">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-black text-center mb-12" style={{ color: '#C4D600' }}>
-            The 4 Projects Included in the Package:
+            Our Featured Projects:
           </h2>
 
           <div className="grid md:grid-cols-2 gap-8">
