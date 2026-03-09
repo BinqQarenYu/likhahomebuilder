@@ -251,11 +251,14 @@ const ImageCarousel = ({ images }) => {
               onClick={() => {
                 const diff = (i - currentIndex + imagesCount) % imagesCount;
                 const distance = diff > imagesCount / 2 ? diff - imagesCount : diff;
+
+                // If already centered, open lightbox
                 if (distance === 0) {
                   setLightboxIndex(i);
                   setLightboxOpen(true);
-                } else if (Math.abs(distance) <= 2) {
-                  setTransitionDuration(400);
+                } else {
+                  // If not centered, move to this image first
+                  setTransitionDuration(500);
                   setCurrentIndex(i);
                 }
               }}
@@ -321,19 +324,27 @@ const ImageCarousel = ({ images }) => {
 
       {/* Lightbox Modal (Radix UI) */}
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
-        <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-transparent border-none flex items-center justify-center outline-none shadow-none z-[1000]">
+        <DialogContent className="max-w-[90vw] max-h-[85vh] p-0 bg-black/95 border border-white/10 flex items-center justify-center outline-none shadow-2xl z-[1000] rounded-2xl overflow-hidden">
           <DialogTitle className="sr-only">Project High-Resolution View</DialogTitle>
-          <div className="relative group w-full h-full flex items-center justify-center h-[90vh]">
+          <div className="relative group w-full h-full flex items-center justify-center h-[70vh] md:h-[80vh] p-4">
+            {/* Top Bar for Close Button - Ensure visibility */}
+            <div className="absolute top-0 left-0 right-0 h-16 flex items-center justify-end px-6 z-[1100] pointer-events-none">
+              <DialogClose className="p-3 bg-white/10 hover:bg-[#C4D600] text-white hover:text-black rounded-full transition-all outline-none border border-white/20 pointer-events-auto backdrop-blur-md">
+                <X className="w-6 h-6" />
+                <span className="sr-only">Close</span>
+              </DialogClose>
+            </div>
+
             {/* Navigation Arrows */}
             <button
-              className="absolute left-6 text-white hover:text-[#C4D600] z-50 p-2 transition-colors bg-black/20 rounded-full backdrop-blur-sm"
+              className="absolute left-6 text-white hover:text-[#C4D600] z-50 p-3 transition-colors bg-black/40 hover:bg-black/60 rounded-full backdrop-blur-sm border border-white/10"
               onClick={(e) => {
                 e.stopPropagation();
                 setLightboxIndex((prev) => (prev - 1 + imagesCount) % imagesCount);
               }}
               aria-label="Previous image"
             >
-              <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
@@ -346,22 +357,17 @@ const ImageCarousel = ({ images }) => {
             />
 
             <button
-              className="absolute right-6 text-white hover:text-[#C4D600] z-50 p-2 transition-colors bg-black/20 rounded-full backdrop-blur-sm"
+              className="absolute right-6 text-white hover:text-[#C4D600] z-50 p-3 transition-colors bg-black/40 hover:bg-black/60 rounded-full backdrop-blur-sm border border-white/10"
               onClick={(e) => {
                 e.stopPropagation();
                 setLightboxIndex((prev) => (prev + 1) % imagesCount);
               }}
               aria-label="Next image"
             >
-              <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
-
-            <DialogClose className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-black/80 text-white rounded-full transition-all outline-none border border-white/20">
-              <X className="w-6 h-6" />
-              <span className="sr-only">Close</span>
-            </DialogClose>
           </div>
         </DialogContent>
       </Dialog>
