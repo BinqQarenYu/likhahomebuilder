@@ -375,19 +375,7 @@ const ImageCarousel = ({ images }) => {
   );
 };
 
-const HomePage = () => {
-  const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
-  const navigate = useNavigate();
-
-  // Tell the Facebook SDK to look for and "wake up" the videos on the page
-  React.useEffect(() => {
-    if (window.FB) {
-      window.FB.XFBML.parse();
-    }
-  }, []);
-
-  const projects = [
+const projects = [
     {
       id: 1,
       emoji: '🔹',
@@ -423,7 +411,7 @@ const HomePage = () => {
     },
   ];
 
-  const bonuses = [
+const bonuses = [
     {
       id: 1,
       title: 'Bonus #1',
@@ -447,7 +435,7 @@ const HomePage = () => {
     },
   ];
 
-  const whatsIncluded = [
+const whatsIncluded = [
     'Complete list of materials (with a focus on economy)',
     'Optimized cutting plans with measurements',
     'Step-by-step assembly notebook',
@@ -455,7 +443,7 @@ const HomePage = () => {
     'Architectural projects in PDF and DWG',
   ];
 
-  const whyPerfect = [
+const whyPerfect = [
     { icon: '📉', text: 'Low cost of execution – without sacrificing quality' },
     { icon: '🏗️', text: 'Optimized designs for fast construction' },
     { icon: '💰', text: 'Full focus on generating passive income with Airbnb' },
@@ -463,7 +451,7 @@ const HomePage = () => {
     { icon: '🧱', text: 'Developed by an architect with experience in real and profitable projects' },
   ];
 
-  const faqs = [
+const faqs = [
     {
       question: 'HOW DO I ACCESS THE PRODUCT AFTER PURCHASE?',
       answer: 'Immediately after payment approval, a link to access the download platform will be sent to your registered email.',
@@ -477,6 +465,18 @@ const HomePage = () => {
       answer: 'YES DIY Level: ALL LEVELS',
     },
   ];
+
+const HomePage = () => {
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  // Tell the Facebook SDK to look for and "wake up" the videos on the page
+  React.useEffect(() => {
+    if (window.FB) {
+      window.FB.XFBML.parse();
+    }
+  }, []);
 
   const handlePurchase = () => {
     navigate('/contact#contact-form');
