@@ -9,3 +9,7 @@
 ## 2024-05-23 - Carousel Mobile & Auto-Play Enhancements
 **Learning:** Carousels on mobile that rely solely on small navigation arrows provide a poor UX, as users naturally expect to swipe between images. Additionally, static carousels without auto-play can cause users to miss out on content hidden behind the first slide. Auto-play needs to pause on hover/focus to remain accessible.
 **Action:** Always implement touch event handlers (`onTouchStart`, `onTouchMove`, `onTouchEnd`) for swipe gestures on carousels to improve mobile UX. Introduce auto-play with a `setInterval` to encourage discovery, but strictly ensure the interval is cleared when the carousel is hovered or focused to respect user control and accessibility guidelines.
+
+## 2025-03-14 - Unassociated Form Labels and Missing ARIA Labels
+**Learning:** Discovered a pattern where form `<label>` elements lack the `htmlFor` attribute, and their corresponding `<Input>` and `<Textarea>` elements lack an `id`. This breaks screen reader association and prevents users from focusing the input by clicking the label. Additionally, isolated input fields (like a newsletter email field) without visible labels need an `aria-label` for context.
+**Action:** Always link labels to inputs using `htmlFor` and `id` attributes. If an input is visually isolated without a descriptive label, add an explicit `aria-label` to provide context for assistive technologies.
