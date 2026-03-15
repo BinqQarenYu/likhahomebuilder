@@ -12,6 +12,13 @@ from routes import contact, newsletter, purchase
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
+# Validate required environment variables on startup
+if not os.getenv("ADMIN_SECRET_TOKEN"):
+    logger = logging.getLogger(__name__)
+    logger.critical("ADMIN_SECRET_TOKEN environment variable is not set. Refusing to start.")
+    import sys
+    sys.exit(1)
+
 # Create the main app without a prefix
 app = FastAPI(title="Likha Home Builders API", version="1.0.0")
 
