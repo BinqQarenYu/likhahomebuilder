@@ -63,10 +63,12 @@ const Footer = () => {
             <Input
               type="email"
               placeholder="Enter your email"
+              aria-label="Email address for newsletter"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="bg-black border-zinc-700 text-white"
               disabled={loading}
+              required
             />
             <Button
               type="submit"

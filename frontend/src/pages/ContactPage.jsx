@@ -154,10 +154,11 @@ const ContactPage = () => {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label className="text-white text-sm font-semibold mb-2 block">
+                      <label htmlFor="name" className="text-white text-sm font-semibold mb-2 block">
                         Full Name *
                       </label>
                       <Input
+                        id="name"
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
@@ -169,10 +170,11 @@ const ContactPage = () => {
                     </div>
 
                     <div>
-                      <label className="text-white text-sm font-semibold mb-2 block">
+                      <label htmlFor="email" className="text-white text-sm font-semibold mb-2 block">
                         Email Address *
                       </label>
                       <Input
+                        id="email"
                         name="email"
                         type="email"
                         value={formData.email}
@@ -187,10 +189,11 @@ const ContactPage = () => {
 
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label className="text-white text-sm font-semibold mb-2 block">
+                      <label htmlFor="phone" className="text-white text-sm font-semibold mb-2 block">
                         Phone Number
                       </label>
                       <Input
+                        id="phone"
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
@@ -201,10 +204,11 @@ const ContactPage = () => {
                     </div>
 
                     <div>
-                      <label className="text-white text-sm font-semibold mb-2 block">
+                      <label htmlFor="subject" className="text-white text-sm font-semibold mb-2 block">
                         Subject *
                       </label>
                       <Input
+                        id="subject"
                         name="subject"
                         value={formData.subject}
                         onChange={handleChange}
@@ -217,10 +221,11 @@ const ContactPage = () => {
                   </div>
 
                   <div>
-                    <label className="text-white text-sm font-semibold mb-2 block">
+                    <label htmlFor="message" className="text-white text-sm font-semibold mb-2 block">
                       Message *
                     </label>
                     <Textarea
+                      id="message"
                       name="message"
                       value={formData.message}
                       onChange={handleChange}
