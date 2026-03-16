@@ -70,6 +70,31 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+@app.on_event("startup")
+async def create_indexes():
+    """
+    ⚡ Bolt: Initialize database indexes on startup to ensure optimal query performance.
+    Indexes transform O(n) collection scans into O(log n) tree lookups.
+    """
+    from database import get_database
+    try:
+        db = await get_database()
+
+        # ⚡ Bolt: Unique index on email for newsletter to optimize find_one_and_update (upserts)
+        await db.newsletter_subscribers.create_index("email", unique=True)
+        # ⚡ Bolt: Descending index on subscribed_at to optimize admin dashboard sorting
+        await db.newsletter_subscribers.create_index([("subscribed_at", -1)])
+
+        # ⚡ Bolt: Descending index on created_at to optimize admin contact list sorting
+        await db.contacts.create_index([("created_at", -1)])
+
+        # ⚡ Bolt: Descending index on created_at to optimize admin purchase inquiry sorting
+        await db.purchase_inquiries.create_index([("created_at", -1)])
+
+        logger.info("Database indexes verified/created successfully.")
+    except Exception as e:
+        logger.error(f"Failed to create database indexes: {e}")
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     from database import close_db_connection
