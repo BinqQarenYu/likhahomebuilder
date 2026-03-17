@@ -240,8 +240,11 @@ const ImageCarousel = ({ images }) => {
           {images.map((img, i) => (
             <div
               key={i}
-              className="absolute inset-0 w-full h-full rounded-2xl overflow-hidden border border-white/10"
+              className="absolute inset-0 w-full h-full rounded-2xl overflow-hidden border border-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C4D600]"
               style={getImageStyles(i)}
+              role="button"
+              tabIndex={0}
+              aria-label={`View project image ${i + 1}`}
               onMouseEnter={() => setHoveredIndex(i)}
               onMouseMove={(e) => handleFrameMouseMove(e, i)}
               onMouseLeave={() => {
@@ -260,6 +263,20 @@ const ImageCarousel = ({ images }) => {
                   // If not centered, move to this image first
                   setTransitionDuration(500);
                   setCurrentIndex(i);
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  const diff = (i - currentIndex + imagesCount) % imagesCount;
+                  const distance = diff > imagesCount / 2 ? diff - imagesCount : diff;
+                  if (distance === 0) {
+                    setLightboxIndex(i);
+                    setLightboxOpen(true);
+                  } else {
+                    setTransitionDuration(500);
+                    setCurrentIndex(i);
+                  }
                 }
               }}
             >
@@ -281,7 +298,7 @@ const ImageCarousel = ({ images }) => {
           <div className="flex justify-center items-center gap-6 pointer-events-auto">
             <button
               onClick={() => handlePrev(1)}
-              className="p-3 bg-white/5 hover:bg-[#C4D600] text-white hover:text-black rounded-full transition-all border border-white/10 hover:border-[#C4D600] group"
+              className="p-3 bg-white/5 hover:bg-[#C4D600] text-white hover:text-black rounded-full transition-all border border-white/10 hover:border-[#C4D600] group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C4D600]"
               aria-label="Previous"
             >
               <svg className="w-6 h-6 transform transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -307,7 +324,7 @@ const ImageCarousel = ({ images }) => {
 
             <button
               onClick={() => handleNext(1)}
-              className="p-3 bg-white/5 hover:bg-[#C4D600] text-white hover:text-black rounded-full transition-all border border-white/10 hover:border-[#C4D600] group"
+              className="p-3 bg-white/5 hover:bg-[#C4D600] text-white hover:text-black rounded-full transition-all border border-white/10 hover:border-[#C4D600] group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C4D600]"
               aria-label="Next"
             >
               <svg className="w-6 h-6 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -337,7 +354,7 @@ const ImageCarousel = ({ images }) => {
 
             {/* Navigation Arrows */}
             <button
-              className="absolute left-6 text-white hover:text-[#C4D600] z-50 p-3 transition-colors bg-black/40 hover:bg-black/60 rounded-full backdrop-blur-sm border border-white/10"
+              className="absolute left-6 text-white hover:text-[#C4D600] z-50 p-3 transition-colors bg-black/40 hover:bg-black/60 rounded-full backdrop-blur-sm border border-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C4D600]"
               onClick={(e) => {
                 e.stopPropagation();
                 setLightboxIndex((prev) => (prev - 1 + imagesCount) % imagesCount);
@@ -357,7 +374,7 @@ const ImageCarousel = ({ images }) => {
             />
 
             <button
-              className="absolute right-6 text-white hover:text-[#C4D600] z-50 p-3 transition-colors bg-black/40 hover:bg-black/60 rounded-full backdrop-blur-sm border border-white/10"
+              className="absolute right-6 text-white hover:text-[#C4D600] z-50 p-3 transition-colors bg-black/40 hover:bg-black/60 rounded-full backdrop-blur-sm border border-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C4D600]"
               onClick={(e) => {
                 e.stopPropagation();
                 setLightboxIndex((prev) => (prev + 1) % imagesCount);
