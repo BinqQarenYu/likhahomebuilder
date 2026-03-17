@@ -7,3 +7,8 @@
 **Vulnerability:** The `ADMIN_SECRET_TOKEN` environment variable had a hardcoded default fallback (`"default_secret_token_change_me"`) in `backend/auth.py`. If the environment variable was missing, anyone knowing this default string could gain full admin access to the application endpoints.
 **Learning:** Default fallbacks for authentication secrets completely undermine the security of environment variables. It's better for the application to fail to start or explicitly return a server error than to silently use a known, insecure secret.
 **Prevention:** Always raise an explicit error or fail securely if critical security configuration is missing during initialization or execution, rather than providing fallback credentials.
+
+## 2024-05-23 - [Missing Security Headers]
+**Vulnerability:** The API responses lacked essential security headers (e.g., `X-Content-Type-Options`, `X-Frame-Options`, `Strict-Transport-Security`, `X-XSS-Protection`), potentially exposing the application to clickjacking, MIME-sniffing, and XSS attacks.
+**Learning:** Default framework configurations (like FastAPI) don't automatically inject defensive security headers. Defense in depth requires explicit configuration of these headers to protect users and data from common web vulnerabilities.
+**Prevention:** Implement a global middleware that automatically attaches recommended security headers (`X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Strict-Transport-Security`, `X-XSS-Protection: 1; mode=block`) to all outgoing responses.
