@@ -1,3 +1,8 @@
+## 2024-05-23 - [Missing HTTP Security Headers]
+**Vulnerability:** The API responses were lacking essential HTTP security headers (like `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, and `Strict-Transport-Security`). This omission left the application vulnerable to basic attacks such as MIME-type sniffing, clickjacking, and man-in-the-middle attacks (for non-HSTS connections).
+**Learning:** Default framework setups (like FastAPI without explicit security middleware) do not automatically include defense-in-depth security headers.
+**Prevention:** Always implement a dedicated middleware early in the project lifecycle to uniformly apply strict security headers to all outgoing HTTP responses.
+
 ## 2024-05-23 - [API Authorization & CORS Security]
 **Vulnerability:** Admin endpoints (GET /contact, GET /newsletter, GET /purchase) were publicly accessible, exposing Personally Identifiable Information (PII) of customers and subscribers. Additionally, CORS was configured with `allow_origins=["*"]` while `allow_credentials=True`, which is insecure and often rejected by modern browsers for authenticated requests.
 **Learning:** Initial development often focuses on functionality, leaving "admin" endpoints unprotected under the assumption they are "internal" or "hidden". Wildcard CORS is often a default that persists into production.
