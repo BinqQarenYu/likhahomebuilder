@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock, Send, Loader2 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
@@ -155,7 +155,7 @@ const ContactPage = () => {
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
                       <label htmlFor="name" className="text-white text-sm font-semibold mb-2 block">
-                        Full Name *
+                        Full Name <span className="text-red-500" aria-hidden="true">*</span>
                       </label>
                       <Input
                         id="name"
@@ -171,7 +171,7 @@ const ContactPage = () => {
 
                     <div>
                       <label htmlFor="email" className="text-white text-sm font-semibold mb-2 block">
-                        Email Address *
+                        Email Address <span className="text-red-500" aria-hidden="true">*</span>
                       </label>
                       <Input
                         id="email"
@@ -205,7 +205,7 @@ const ContactPage = () => {
 
                     <div>
                       <label htmlFor="subject" className="text-white text-sm font-semibold mb-2 block">
-                        Subject *
+                        Subject <span className="text-red-500" aria-hidden="true">*</span>
                       </label>
                       <Input
                         id="subject"
@@ -222,7 +222,7 @@ const ContactPage = () => {
 
                   <div>
                     <label htmlFor="message" className="text-white text-sm font-semibold mb-2 block">
-                      Message *
+                      Message <span className="text-red-500" aria-hidden="true">*</span>
                     </label>
                     <Textarea
                       id="message"
@@ -243,8 +243,15 @@ const ContactPage = () => {
                     className="w-full py-6 text-lg font-bold rounded-full transition-all duration-300 hover:scale-105"
                     style={{ backgroundColor: '#C4D600', color: '#000' }}
                   >
-                    <Send className="mr-2 h-5 w-5" />
-                    {loading ? 'Sending...' : 'Send Message'}
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5" style={{ animation: 'spin 1s linear infinite' }} /> Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="mr-2 h-5 w-5" /> Send Message
+                      </>
+                    )}
                   </Button>
                 </form>
               </CardContent>
