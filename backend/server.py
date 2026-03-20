@@ -49,6 +49,15 @@ carousel_dir = ROOT_DIR.parent / "frontend" / "public" / "carousel"
 if carousel_dir.exists():
     app.mount("/carousel", CachedStaticFiles(directory=str(carousel_dir)), name="carousel")
 
+@app.middleware("http")
+async def add_security_headers(request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    return response
+
 # Configure CORS - Get from environment variable or use defaults
 # In production, ALLOWED_ORIGINS should be set in the .env file
 # e.g., ALLOWED_ORIGINS=https://yourdomain.com
