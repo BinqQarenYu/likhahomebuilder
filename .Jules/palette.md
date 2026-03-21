@@ -13,3 +13,7 @@
 ## 2024-05-26 - Form Inputs Lacking Explicit Labels or ARIA Attributes
 **Learning:** Found cases where form inputs lacked explicit `<label>` association via `htmlFor`/`id` pairs, or standalone inputs like a newsletter email field missed an `aria-label`. This makes it difficult or impossible for screen reader users to identify the purpose of the input.
 **Action:** Always explicitly link a visible `<label>` to an input using `htmlFor` and `id`. If an input does not have a visible label (e.g., a newsletter sign-up with just a placeholder), provide an `aria-label` attribute to ensure the purpose is clear to assistive technologies.
+
+## 2024-05-27 - Missing Loading States for Async Operations
+**Learning:** Found that async operations (like form submissions) lacked visual loading indicators (e.g., spinners). Changing only the text to "Submitting..." is often not enough visual feedback, especially when the button color or shape remains the same.
+**Action:** Always add a visual spinner (like `Loader2` from `lucide-react` with `animate-spin`) alongside text changes during async operations. Also ensure the button is properly `disabled` to prevent duplicate submissions and announce state to screen readers.
