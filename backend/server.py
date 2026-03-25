@@ -2,6 +2,7 @@ from fastapi import FastAPI, APIRouter
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 import os
 import logging
 from pathlib import Path
@@ -34,6 +35,9 @@ api_router.include_router(purchase.router)
 
 # Include the router in the main app
 app.include_router(api_router)
+
+# Add GZip compression for all responses > 500 bytes
+app.add_middleware(GZipMiddleware, minimum_size=500)
 
 from starlette.responses import Response
 

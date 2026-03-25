@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, X } from 'lucide-react';
 import { Button } from '../components/ui/button';
@@ -24,7 +24,6 @@ const ImageCarousel = ({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
-  const [mouseY, setMouseY] = useState(0);
 
   // Lightbox State
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -39,19 +38,20 @@ const ImageCarousel = ({ images }) => {
 
   const imagesCount = images.length;
 
-  const handleNext = (count = 1) => {
+  const handleNext = useCallback((count = 1) => {
     const moveCount = typeof count === 'number' ? count : 1;
     setTransitionDuration(400); // Snappier manual navigation
     setCurrentIndex((prev) => (prev + moveCount) % imagesCount);
-  };
+  }, [imagesCount]);
 
-  const handlePrev = (count = 1) => {
+  const handlePrev = useCallback((count = 1) => {
     const moveCount = typeof count === 'number' ? count : 1;
     setTransitionDuration(400); // Snappier manual navigation
     setCurrentIndex((prev) => (prev - moveCount + imagesCount) % imagesCount);
-  };
+  }, [imagesCount]);
 
   // Auto-play Logic (4 seconds)
+  // Optimization: Auto-play is only active when carousel is not being interacted with
   React.useEffect(() => {
     if (isHovered || isDragging || lightboxOpen) return;
     const interval = setInterval(() => {
@@ -59,7 +59,7 @@ const ImageCarousel = ({ images }) => {
       handleNext();
     }, 4000);
     return () => clearInterval(interval);
-  }, [currentIndex, isHovered, isDragging, lightboxOpen]);
+  }, [currentIndex, isHovered, isDragging, lightboxOpen, handleNext]);
 
   const handleStart = (clientX) => {
     setDragStart(clientX);
@@ -122,7 +122,9 @@ const ImageCarousel = ({ images }) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const y = e.clientY - rect.top;
     const percentY = (y / rect.height) * 2 - 1; // -1 to 1
-    setMouseY(percentY);
+    // Optimization: Update CSS variable directly to avoid high-frequency React re-renders on mouse move.
+    // Impact: Reduces re-renders from ~60/sec (browser refresh rate) to 0 during mouse interaction.
+    e.currentTarget.style.setProperty('--tilt-y', percentY.toString());
   };
 
   // Keyboard Navigation for Lightbox
@@ -193,14 +195,16 @@ const ImageCarousel = ({ images }) => {
       scale = 0.5;
     }
 
+    let rotateXStr = '0deg';
     if (isThisHovered && !isDragging) {
       scale += 0.05; // Hover Lift
       zIndex += 10;  // Boost Depth
-      rotateX = -mouseY * 8; // 3D Tilt
+      // Use CSS variable for tilt to avoid re-renders
+      rotateXStr = 'calc(var(--tilt-y, 0) * -8deg)';
     }
 
     return {
-      transform: `translateX(${translateX}%) scale(${scale}) rotateY(${rotateY}deg) rotateX(${rotateX}deg)`,
+      transform: `translateX(${translateX}%) scale(${scale}) rotateY(${rotateY}deg) rotateX(${rotateXStr})`,
       zIndex: zIndex,
       opacity: opacity,
       boxShadow: boxShadow,
@@ -223,7 +227,6 @@ const ImageCarousel = ({ images }) => {
         onMouseLeave={() => {
           setIsHovered(false);
           setHoveredIndex(null);
-          setMouseY(0);
         }}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
@@ -244,9 +247,9 @@ const ImageCarousel = ({ images }) => {
               style={getImageStyles(i)}
               onMouseEnter={() => setHoveredIndex(i)}
               onMouseMove={(e) => handleFrameMouseMove(e, i)}
-              onMouseLeave={() => {
+              onMouseLeave={(e) => {
                 setHoveredIndex(null);
-                setMouseY(0);
+                e.currentTarget.style.setProperty('--tilt-y', '0');
               }}
               onClick={() => {
                 const diff = (i - currentIndex + imagesCount) % imagesCount;
