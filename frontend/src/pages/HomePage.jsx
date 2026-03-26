@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, X } from 'lucide-react';
 import { Button } from '../components/ui/button';
@@ -24,7 +24,9 @@ const ImageCarousel = ({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
-  const [mouseY, setMouseY] = useState(0);
+
+  // Optimized Refs for high-frequency interactions (Performance)
+  const carouselRef = useRef(null);
 
   // Lightbox State
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -32,24 +34,23 @@ const ImageCarousel = ({ images }) => {
 
   // Velocity Navigation State
   const [dragStart, setDragStart] = useState(0);
-  const [dragOffset, setDragOffset] = useState(0);
   const [startTime, setStartTime] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [transitionDuration, setTransitionDuration] = useState(600);
 
   const imagesCount = images.length;
 
-  const handleNext = (count = 1) => {
+  const handleNext = useCallback((count = 1) => {
     const moveCount = typeof count === 'number' ? count : 1;
     setTransitionDuration(400); // Snappier manual navigation
     setCurrentIndex((prev) => (prev + moveCount) % imagesCount);
-  };
+  }, [imagesCount]);
 
-  const handlePrev = (count = 1) => {
+  const handlePrev = useCallback((count = 1) => {
     const moveCount = typeof count === 'number' ? count : 1;
     setTransitionDuration(400); // Snappier manual navigation
     setCurrentIndex((prev) => (prev - moveCount + imagesCount) % imagesCount);
-  };
+  }, [imagesCount]);
 
   // Auto-play Logic (4 seconds)
   React.useEffect(() => {
@@ -61,20 +62,25 @@ const ImageCarousel = ({ images }) => {
     return () => clearInterval(interval);
   }, [currentIndex, isHovered, isDragging, lightboxOpen]);
 
-  const handleStart = (clientX) => {
+  const handleStart = useCallback((clientX) => {
     setDragStart(clientX);
     setStartTime(Date.now());
     setIsDragging(true);
-    setDragOffset(0);
-  };
+    if (carouselRef.current) {
+      carouselRef.current.style.setProperty('--drag-offset', '0');
+    }
+  }, []);
 
-  const handleMove = (clientX) => {
+  const handleMove = useCallback((clientX) => {
     if (!isDragging) return;
     const offset = clientX - dragStart;
-    setDragOffset(offset);
-  };
+    if (carouselRef.current) {
+      // ⚡ Bolt: Direct DOM manipulation to avoid high-frequency React re-renders during drag
+      carouselRef.current.style.setProperty('--drag-offset', `${offset}`);
+    }
+  }, [isDragging, dragStart]);
 
-  const handleEnd = (clientX) => {
+  const handleEnd = useCallback((clientX) => {
     if (!isDragging) return;
 
     const distance = dragStart - clientX;
@@ -96,34 +102,45 @@ const ImageCarousel = ({ images }) => {
     }
 
     setIsDragging(false);
-    setDragOffset(0);
-  };
+    if (carouselRef.current) {
+      carouselRef.current.style.setProperty('--drag-offset', '0');
+    }
+  }, [isDragging, dragStart, startTime, handleNext, handlePrev]);
 
   // Event Adapters for unified Touch & Mouse support
-  const onTouchStart = (e) => handleStart(e.touches[0].clientX);
-  const onTouchMove = (e) => handleMove(e.touches[0].clientX);
-  const onTouchEnd = (e) => handleEnd(e.changedTouches[0].clientX);
+  const onTouchStart = useCallback((e) => handleStart(e.touches[0].clientX), [handleStart]);
+  const onTouchMove = useCallback((e) => handleMove(e.touches[0].clientX), [handleMove]);
+  const onTouchEnd = useCallback((e) => handleEnd(e.changedTouches[0].clientX), [handleEnd]);
 
-  const onMouseDown = (e) => {
-    handleStart(e.clientX);
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
-  };
-
-  const onMouseMove = (e) => handleMove(e.clientX);
-  const onMouseUp = (e) => {
+  const onMouseMove = useCallback((e) => handleMove(e.clientX), [handleMove]);
+  const onMouseUp = useCallback((e) => {
     handleEnd(e.clientX);
     window.removeEventListener('mousemove', onMouseMove);
     window.removeEventListener('mouseup', onMouseUp);
-  };
+  }, [handleEnd, onMouseMove]);
 
-  const handleFrameMouseMove = (e, index) => {
+  const onMouseDown = useCallback((e) => {
+    if (e.button !== 0) return; // Only left-click
+    handleStart(e.clientX);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  }, [handleStart, onMouseMove, onMouseUp]);
+
+  // Handle re-render synchronization
+  React.useLayoutEffect(() => {
+    if (carouselRef.current) {
+      carouselRef.current.style.setProperty('--drag-offset', '0');
+    }
+  }, [currentIndex]);
+
+  const handleFrameMouseMove = useCallback((e, index) => {
     if (index !== currentIndex && index !== hoveredIndex) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const y = e.clientY - rect.top;
     const percentY = (y / rect.height) * 2 - 1; // -1 to 1
-    setMouseY(percentY);
-  };
+    // ⚡ Bolt: Direct DOM manipulation to avoid high-frequency React re-renders during tilt
+    e.currentTarget.style.setProperty('--tilt-y', `${percentY}`);
+  }, [currentIndex, hoveredIndex]);
 
   // Keyboard Navigation for Lightbox
   React.useEffect(() => {
@@ -196,11 +213,14 @@ const ImageCarousel = ({ images }) => {
     if (isThisHovered && !isDragging) {
       scale += 0.05; // Hover Lift
       zIndex += 10;  // Boost Depth
-      rotateX = -mouseY * 8; // 3D Tilt
+      // Use CSS variable for tilt to avoid re-renders
+      rotateX = `calc(var(--tilt-y, 0) * -8deg)`;
     }
 
     return {
-      transform: `translateX(${translateX}%) scale(${scale}) rotateY(${rotateY}deg) rotateX(${rotateX}deg)`,
+      transform: isThisHovered && !isDragging
+        ? `translateX(${translateX}%) scale(${scale}) rotateY(${rotateY}deg) rotateX(${rotateX})`
+        : `translateX(${translateX}%) scale(${scale}) rotateY(${rotateY}deg) rotateX(${rotateX}deg)`,
       zIndex: zIndex,
       opacity: opacity,
       boxShadow: boxShadow,
@@ -223,7 +243,9 @@ const ImageCarousel = ({ images }) => {
         onMouseLeave={() => {
           setIsHovered(false);
           setHoveredIndex(null);
-          setMouseY(0);
+          if (carouselRef.current) {
+            carouselRef.current.style.setProperty('--drag-offset', '0');
+          }
         }}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
@@ -231,9 +253,11 @@ const ImageCarousel = ({ images }) => {
         onMouseDown={onMouseDown}
       >
         <div
+          ref={carouselRef}
           className="relative w-[180px] md:w-[260px] h-[320px] md:h-[480px] [transform-style:preserve-3d] transition-transform duration-300"
           style={{
-            transform: `rotateY(${dragOffset / 10}deg)`, // Visual Fan Tilt during drag
+            // ⚡ Bolt: Use CSS variable for fan tilt to avoid re-renders
+            transform: `rotateY(calc(var(--drag-offset, 0) / 10 * 1deg))`,
             cursor: isDragging ? 'grabbing' : 'grab'
           }}
         >
@@ -244,9 +268,9 @@ const ImageCarousel = ({ images }) => {
               style={getImageStyles(i)}
               onMouseEnter={() => setHoveredIndex(i)}
               onMouseMove={(e) => handleFrameMouseMove(e, i)}
-              onMouseLeave={() => {
+              onMouseLeave={(e) => {
                 setHoveredIndex(null);
-                setMouseY(0);
+                e.currentTarget.style.setProperty('--tilt-y', '0');
               }}
               onClick={() => {
                 const diff = (i - currentIndex + imagesCount) % imagesCount;
