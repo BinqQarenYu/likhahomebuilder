@@ -251,6 +251,43 @@ def test_purchase_inquiry():
         print(f"❌ Purchase inquiry error: {e}")
         return False
 
+def test_security_headers():
+    """Test that security headers are applied to responses"""
+    print("\n=== Testing Security Headers ===")
+    try:
+        response = requests.get(f"{BASE_URL}/", timeout=10)
+        print(f"Status Code: {response.status_code}")
+
+        headers = response.headers
+        expected_headers = {
+            "X-Content-Type-Options": "nosniff",
+            "X-Frame-Options": "DENY",
+            "X-XSS-Protection": "1; mode=block",
+            "Strict-Transport-Security": "max-age=31536000; includeSubDomains"
+        }
+
+        all_headers_present = True
+        for header, expected_value in expected_headers.items():
+            if header not in headers:
+                print(f"❌ Missing header: {header}")
+                all_headers_present = False
+            elif headers[header] != expected_value:
+                print(f"❌ Incorrect header value for {header}: expected '{expected_value}', got '{headers[header]}'")
+                all_headers_present = False
+            else:
+                print(f"✅ Found correct header: {header} = {expected_value}")
+
+        if all_headers_present:
+            print("✅ All security headers are present and correct")
+            return True
+        else:
+            print("❌ Security headers test failed")
+            return False
+
+    except Exception as e:
+        print(f"❌ Security headers test error: {e}")
+        return False
+
 def test_unauthorized_access():
     """Test unauthorized access to admin endpoints"""
     print("\n=== Testing Unauthorized Access ===")
@@ -339,6 +376,9 @@ def run_all_tests():
     # Test 9: Unauthorized Access
     test_results["unauthorized_access"] = test_unauthorized_access()
     
+    # Test 10: Security Headers
+    test_results["security_headers"] = test_security_headers()
+
     # Summary
     print("\n" + "="*50)
     print("🎯 TEST RESULTS SUMMARY")
