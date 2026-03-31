@@ -13,3 +13,7 @@
 ## 2024-05-26 - Form Inputs Lacking Explicit Labels or ARIA Attributes
 **Learning:** Found cases where form inputs lacked explicit `<label>` association via `htmlFor`/`id` pairs, or standalone inputs like a newsletter email field missed an `aria-label`. This makes it difficult or impossible for screen reader users to identify the purpose of the input.
 **Action:** Always explicitly link a visible `<label>` to an input using `htmlFor` and `id`. If an input does not have a visible label (e.g., a newsletter sign-up with just a placeholder), provide an `aria-label` attribute to ensure the purpose is clear to assistive technologies.
+
+## 2024-05-28 - Missing Visual Loading Indicators for Async Actions
+**Learning:** Users lack immediate visual feedback when interacting with asynchronous actions like submitting a form or subscribing to a newsletter. The only feedback provided was a text change, which may be missed or misinterpreted without a clear visual cue like a spinning loader.
+**Action:** Always include a visual loading indicator (e.g., a spinning `Loader2` icon from `lucide-react` combined with Tailwind `animate-spin` class) within buttons tied to asynchronous operations to improve perceived performance and clearly communicate system state. Provide descriptive fallback loading text alongside the visual indicator.
