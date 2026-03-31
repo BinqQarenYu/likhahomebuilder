@@ -2,6 +2,8 @@ from fastapi import FastAPI, APIRouter
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
 import os
 import logging
 from pathlib import Path
@@ -48,6 +50,17 @@ class CachedStaticFiles(StaticFiles):
 carousel_dir = ROOT_DIR.parent / "frontend" / "public" / "carousel"
 if carousel_dir.exists():
     app.mount("/carousel", CachedStaticFiles(directory=str(carousel_dir)), name="carousel")
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        return response
+
+app.add_middleware(SecurityHeadersMiddleware)
 
 # Configure CORS - Get from environment variable or use defaults
 # In production, ALLOWED_ORIGINS should be set in the .env file
