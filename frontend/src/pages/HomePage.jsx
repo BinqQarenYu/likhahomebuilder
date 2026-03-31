@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, X } from 'lucide-react';
 import { Button } from '../components/ui/button';
@@ -16,15 +16,13 @@ import {
   DialogClose,
   DialogTitle,
 } from '../components/ui/dialog';
-import { useToast } from '../hooks/use-toast';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
-const ImageCarousel = ({ images }) => {
+const ImageCarousel = React.memo(({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
-  const [mouseY, setMouseY] = useState(0);
 
   // Lightbox State
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -39,17 +37,17 @@ const ImageCarousel = ({ images }) => {
 
   const imagesCount = images.length;
 
-  const handleNext = (count = 1) => {
+  const handleNext = useCallback((count = 1) => {
     const moveCount = typeof count === 'number' ? count : 1;
     setTransitionDuration(400); // Snappier manual navigation
     setCurrentIndex((prev) => (prev + moveCount) % imagesCount);
-  };
+  }, [imagesCount]);
 
-  const handlePrev = (count = 1) => {
+  const handlePrev = useCallback((count = 1) => {
     const moveCount = typeof count === 'number' ? count : 1;
     setTransitionDuration(400); // Snappier manual navigation
     setCurrentIndex((prev) => (prev - moveCount + imagesCount) % imagesCount);
-  };
+  }, [imagesCount]);
 
   // Auto-play Logic (4 seconds)
   React.useEffect(() => {
@@ -59,7 +57,7 @@ const ImageCarousel = ({ images }) => {
       handleNext();
     }, 4000);
     return () => clearInterval(interval);
-  }, [currentIndex, isHovered, isDragging, lightboxOpen]);
+  }, [handleNext, isHovered, isDragging, lightboxOpen]);
 
   const handleStart = (clientX) => {
     setDragStart(clientX);
@@ -122,7 +120,8 @@ const ImageCarousel = ({ images }) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const y = e.clientY - rect.top;
     const percentY = (y / rect.height) * 2 - 1; // -1 to 1
-    setMouseY(percentY);
+    // Direct DOM manipulation to avoid re-renders on mouse move
+    e.currentTarget.style.setProperty('--tilt-y', `${-percentY * 8}deg`);
   };
 
   // Keyboard Navigation for Lightbox
@@ -196,11 +195,11 @@ const ImageCarousel = ({ images }) => {
     if (isThisHovered && !isDragging) {
       scale += 0.05; // Hover Lift
       zIndex += 10;  // Boost Depth
-      rotateX = -mouseY * 8; // 3D Tilt
+      // rotateX is now handled via CSS variable --tilt-y
     }
 
     return {
-      transform: `translateX(${translateX}%) scale(${scale}) rotateY(${rotateY}deg) rotateX(${rotateX}deg)`,
+      transform: `translateX(${translateX}%) scale(${scale}) rotateY(${rotateY}deg) rotateX(var(--tilt-y, 0deg))`,
       zIndex: zIndex,
       opacity: opacity,
       boxShadow: boxShadow,
@@ -223,7 +222,6 @@ const ImageCarousel = ({ images }) => {
         onMouseLeave={() => {
           setIsHovered(false);
           setHoveredIndex(null);
-          setMouseY(0);
         }}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
@@ -244,9 +242,9 @@ const ImageCarousel = ({ images }) => {
               style={getImageStyles(i)}
               onMouseEnter={() => setHoveredIndex(i)}
               onMouseMove={(e) => handleFrameMouseMove(e, i)}
-              onMouseLeave={() => {
+              onMouseLeave={(e) => {
                 setHoveredIndex(null);
-                setMouseY(0);
+                e.currentTarget.style.setProperty('--tilt-y', '0deg');
               }}
               onClick={() => {
                 const diff = (i - currentIndex + imagesCount) % imagesCount;
@@ -373,11 +371,124 @@ const ImageCarousel = ({ images }) => {
       </Dialog>
     </>
   );
-};
+});
+
+// Static data extracted outside component to prevent re-creation on each render
+const PROJECTS = [
+  {
+    id: 1,
+    emoji: '🔹',
+    title: '1 - The Oasis of Autonomy',
+    description: 'True luxury isn’t found in excess; it’s found in independence. Imagine a dwelling that doesn’t just sit on the land, but survives with it. Tucked behind the protective shadow of ancient boulders, this off-grid sanctuary is a testament to the harmony between brutal nature and refined engineering.',
+    image: null,
+    videoSrc: 'https://www.facebook.com/reel/1488990142658620/',
+  },
+  {
+    id: 2,
+    emoji: '🔹',
+    title: '2 - The Tropical Pavilion',
+    description: 'Expansive wrap-around decking extends the living area into the canopy, doubling the usable footprint of the home. An overhanging, angled roofline provides essential solar shading and efficient rainwater runoff, perfect for tropical climates.',
+    image: null,
+    videoSrc: 'https://www.facebook.com/reel/1801707910382021/',
+  },
+  {
+    id: 3,
+    emoji: '🔹',
+    title: '3 - The Sanctuary in Stone',
+    description: 'A modern retreat that rises from the earth, blending raw geological power with sophisticated minimalism. Strategically positioned to harness natural light while providing a fortress of tranquility, this design redefines the boundary between the wild and the refined.',
+    image: null,
+    videoSrc: 'https://www.facebook.com/reel/896609346553070/',
+    link: 'https://www.facebook.com/reel/896609346553070',
+  },
+  {
+    id: 4,
+    emoji: '🔹',
+    title: '4 - The Quiet Architecture',
+    description: 'Living Architecture: A lush green roof that provides natural insulation and integrates the structure into the surrounding meadow. Transparent Living: Floor-to-ceiling glass walls that invite the landscape inside, making the mountains and fields a living part of the home.',
+    image: null,
+    videoSrc: 'https://www.facebook.com/reel/1831145384224834/',
+  },
+];
+
+const BONUSES = [
+  {
+    id: 1,
+    title: 'Bonus #1',
+    subtitle: 'Construction checklists and supplier suggestions',
+    image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=2070&auto=format&fit=crop',
+    originalPrice: '65,00',
+  },
+  {
+    id: 2,
+    title: 'Bonus #2',
+    subtitle: 'Quick Guide to Steel Frame Execution',
+    image: 'https://images.pexels.com/photos/4312841/pexels-photo-4312841.jpeg',
+    originalPrice: '65,00',
+  },
+  {
+    id: 3,
+    title: 'Bonus #3',
+    subtitle: 'List of Recommended Tools and Suppliers',
+    image: 'https://images.unsplash.com/photo-1744235558674-89a6ed881268',
+    originalPrice: '65,00',
+  },
+];
+
+const WHATS_INCLUDED = [
+  'Complete list of materials (with a focus on economy)',
+  'Optimized cutting plans with measurements',
+  'Step-by-step assembly notebook',
+  'Realistic 3D photos of all projects',
+  'Architectural projects in PDF and DWG',
+];
+
+const WHY_PERFECT = [
+  { icon: '📉', text: 'Low cost of execution – without sacrificing quality' },
+  { icon: '🏗️', text: 'Optimized designs for fast construction' },
+  { icon: '💰', text: 'Full focus on generating passive income with Airbnb' },
+  { icon: '💼', text: 'Ideal for beginners or experienced investors' },
+  { icon: '🧱', text: 'Developed by an architect with experience in real and profitable projects' },
+];
+
+const FAQS = [
+  {
+    question: 'HOW DO I ACCESS THE PRODUCT AFTER PURCHASE?',
+    answer: 'Immediately after payment approval, a link to access the download platform will be sent to your registered email.',
+  },
+  {
+    question: 'HOW LONG WILL I HAVE FREE ACCESS?',
+    answer: 'You will have one year of access to the platform.',
+  },
+  {
+    question: 'IS THIS PROJECT EASY TO EXECUTE?',
+    answer: 'YES DIY Level: ALL LEVELS',
+  },
+];
+
+const CAROUSEL_IMAGES = [
+  '/carousel/lowres/122.jpg',
+  '/carousel/lowres/123.jpg',
+  '/carousel/lowres/124.jpg',
+  '/carousel/lowres/126.jpg',
+  '/carousel/lowres/126A.jpg',
+  '/carousel/lowres/128A.jpg',
+  '/carousel/lowres/128B.jpg',
+  '/carousel/lowres/128D.jpg',
+  '/carousel/lowres/129A.jpg',
+  '/carousel/lowres/129C.jpg',
+  '/carousel/lowres/130A.jpg',
+  '/carousel/lowres/130B.jpg',
+  '/carousel/lowres/130C.jpg',
+  '/carousel/lowres/131A.jpg',
+  '/carousel/lowres/131B.jpg',
+  '/carousel/lowres/131C.jpg',
+  '/carousel/lowres/132A.jpg',
+  '/carousel/lowres/132B.jpg',
+  '/carousel/lowres/file_1772370111389.jpg',
+  '/carousel/lowres/file_1772370122487.jpg'
+].map(img => `${process.env.PUBLIC_URL || ''}${img}`);
 
 const HomePage = () => {
-  const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
   const navigate = useNavigate();
 
   // Tell the Facebook SDK to look for and "wake up" the videos on the page
@@ -387,98 +498,7 @@ const HomePage = () => {
     }
   }, []);
 
-  const projects = [
-    {
-      id: 1,
-      emoji: '🔹',
-      title: '1 - The Oasis of Autonomy',
-      description: 'True luxury isn’t found in excess; it’s found in independence. Imagine a dwelling that doesn’t just sit on the land, but survives with it. Tucked behind the protective shadow of ancient boulders, this off-grid sanctuary is a testament to the harmony between brutal nature and refined engineering.',
-      image: null,
-      videoSrc: 'https://www.facebook.com/reel/1488990142658620/',
-    },
-    {
-      id: 2,
-      emoji: '🔹',
-      title: '2 - The Tropical Pavilion',
-      description: 'Expansive wrap-around decking extends the living area into the canopy, doubling the usable footprint of the home. An overhanging, angled roofline provides essential solar shading and efficient rainwater runoff, perfect for tropical climates.',
-      image: null,
-      videoSrc: 'https://www.facebook.com/reel/1801707910382021/',
-    },
-    {
-      id: 3,
-      emoji: '🔹',
-      title: '3 - The Sanctuary in Stone',
-      description: 'A modern retreat that rises from the earth, blending raw geological power with sophisticated minimalism. Strategically positioned to harness natural light while providing a fortress of tranquility, this design redefines the boundary between the wild and the refined.',
-      image: null,
-      videoSrc: 'https://www.facebook.com/reel/896609346553070/',
-      link: 'https://www.facebook.com/reel/896609346553070',
-    },
-    {
-      id: 4,
-      emoji: '🔹',
-      title: '4 - The Quiet Architecture',
-      description: 'Living Architecture: A lush green roof that provides natural insulation and integrates the structure into the surrounding meadow. Transparent Living: Floor-to-ceiling glass walls that invite the landscape inside, making the mountains and fields a living part of the home.',
-      image: null,
-      videoSrc: 'https://www.facebook.com/reel/1831145384224834/',
-    },
-  ];
-
-  const bonuses = [
-    {
-      id: 1,
-      title: 'Bonus #1',
-      subtitle: 'Construction checklists and supplier suggestions',
-      image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=2070&auto=format&fit=crop',
-      originalPrice: '65,00',
-    },
-    {
-      id: 2,
-      title: 'Bonus #2',
-      subtitle: 'Quick Guide to Steel Frame Execution',
-      image: 'https://images.pexels.com/photos/4312841/pexels-photo-4312841.jpeg',
-      originalPrice: '65,00',
-    },
-    {
-      id: 3,
-      title: 'Bonus #3',
-      subtitle: 'List of Recommended Tools and Suppliers',
-      image: 'https://images.unsplash.com/photo-1744235558674-89a6ed881268',
-      originalPrice: '65,00',
-    },
-  ];
-
-  const whatsIncluded = [
-    'Complete list of materials (with a focus on economy)',
-    'Optimized cutting plans with measurements',
-    'Step-by-step assembly notebook',
-    'Realistic 3D photos of all projects',
-    'Architectural projects in PDF and DWG',
-  ];
-
-  const whyPerfect = [
-    { icon: '📉', text: 'Low cost of execution – without sacrificing quality' },
-    { icon: '🏗️', text: 'Optimized designs for fast construction' },
-    { icon: '💰', text: 'Full focus on generating passive income with Airbnb' },
-    { icon: '💼', text: 'Ideal for beginners or experienced investors' },
-    { icon: '🧱', text: 'Developed by an architect with experience in real and profitable projects' },
-  ];
-
-  const faqs = [
-    {
-      question: 'HOW DO I ACCESS THE PRODUCT AFTER PURCHASE?',
-      answer: 'Immediately after payment approval, a link to access the download platform will be sent to your registered email.',
-    },
-    {
-      question: 'HOW LONG WILL I HAVE FREE ACCESS?',
-      answer: 'You will have one year of access to the platform.',
-    },
-    {
-      question: 'IS THIS PROJECT EASY TO EXECUTE?',
-      answer: 'YES DIY Level: ALL LEVELS',
-    },
-  ];
-
-  const handlePurchase = () => {
+  const handlePurchase = useCallback(() => {
     navigate('/contact#contact-form');
     // Scroll to top first in case already on contact page or to trigger hash jump
     window.scrollTo(0, 0);
@@ -489,7 +509,7 @@ const HomePage = () => {
         element.scrollIntoView({ behavior: 'smooth' });
       }
     }, 100);
-  };
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -503,30 +523,7 @@ const HomePage = () => {
           </h1>
 
           <div className="mb-12 w-full overflow-visible">
-            <ImageCarousel
-              images={[
-                `${process.env.PUBLIC_URL}/carousel/lowres/122.jpg`,
-                `${process.env.PUBLIC_URL}/carousel/lowres/123.jpg`,
-                `${process.env.PUBLIC_URL}/carousel/lowres/124.jpg`,
-                `${process.env.PUBLIC_URL}/carousel/lowres/126.jpg`,
-                `${process.env.PUBLIC_URL}/carousel/lowres/126A.jpg`,
-                `${process.env.PUBLIC_URL}/carousel/lowres/128A.jpg`,
-                `${process.env.PUBLIC_URL}/carousel/lowres/128B.jpg`,
-                `${process.env.PUBLIC_URL}/carousel/lowres/128D.jpg`,
-                `${process.env.PUBLIC_URL}/carousel/lowres/129A.jpg`,
-                `${process.env.PUBLIC_URL}/carousel/lowres/129C.jpg`,
-                `${process.env.PUBLIC_URL}/carousel/lowres/130A.jpg`,
-                `${process.env.PUBLIC_URL}/carousel/lowres/130B.jpg`,
-                `${process.env.PUBLIC_URL}/carousel/lowres/130C.jpg`,
-                `${process.env.PUBLIC_URL}/carousel/lowres/131A.jpg`,
-                `${process.env.PUBLIC_URL}/carousel/lowres/131B.jpg`,
-                `${process.env.PUBLIC_URL}/carousel/lowres/131C.jpg`,
-                `${process.env.PUBLIC_URL}/carousel/lowres/132A.jpg`,
-                `${process.env.PUBLIC_URL}/carousel/lowres/132B.jpg`,
-                `${process.env.PUBLIC_URL}/carousel/lowres/file_1772370111389.jpg`,
-                `${process.env.PUBLIC_URL}/carousel/lowres/file_1772370122487.jpg`
-              ]}
-            />
+            <ImageCarousel images={CAROUSEL_IMAGES} />
           </div>
 
           <h2 className="text-xl md:text-2xl text-white mb-12 max-w-4xl mx-auto leading-relaxed">
@@ -597,7 +594,7 @@ const HomePage = () => {
           </h2>
 
           <div className="grid md:grid-cols-2 gap-8">
-            {projects.map((project, index) => (
+            {PROJECTS.map((project, index) => (
               <Card
                 key={project.id}
                 className="bg-black border-2 border-white rounded-3xl overflow-hidden hover:border-[#C4D600] transition-all duration-300 hover:scale-105"
@@ -661,7 +658,7 @@ const HomePage = () => {
             What's Included in Each Project
           </h2>
           <div className="space-y-4">
-            {whatsIncluded.map((item, index) => (
+            {WHATS_INCLUDED.map((item, index) => (
               <div key={index} className="flex items-start gap-4">
                 <Check className="w-6 h-6 flex-shrink-0 mt-1" style={{ color: '#C4D600' }} />
                 <p className="text-lg text-white">{item}</p>
@@ -678,7 +675,7 @@ const HomePage = () => {
             Why Is This Package Perfect For You?
           </h2>
           <div className="space-y-4">
-            {whyPerfect.map((item, index) => (
+            {WHY_PERFECT.map((item, index) => (
               <div key={index} className="flex items-start gap-4">
                 <span className="text-2xl flex-shrink-0">{item.icon}</span>
                 <p className="text-lg text-white">{item.text}</p>
@@ -696,7 +693,7 @@ const HomePage = () => {
           </h2>
 
           <div className="grid md:grid-cols-3 gap-8 mt-12">
-            {bonuses.map((bonus) => (
+            {BONUSES.map((bonus) => (
               <Card key={bonus.id} className="bg-black border-2 border-white rounded-3xl overflow-hidden">
                 <CardContent className="p-0">
                   <div className="relative h-48 overflow-hidden">
@@ -728,7 +725,7 @@ const HomePage = () => {
             Frequently Asked Questions
           </h2>
           <Accordion type="single" collapsible className="w-full">
-            {faqs.map((faq, index) => (
+            {FAQS.map((faq, index) => (
               <AccordionItem key={index} value={`item-${index}`} className="border-white/20">
                 <AccordionTrigger className="text-left text-lg font-bold hover:text-[#C4D600] py-6">
                   {faq.question}
