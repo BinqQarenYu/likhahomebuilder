@@ -149,4 +149,9 @@ const Header = () => {
   );
 };
 
-export default Header;
+// ⚡ Bolt Performance Optimization:
+// Wrap the Header component in React.memo() to prevent unnecessary re-renders.
+// Since Header is a pure presentation component containing navigation links that
+// do not rely on rapidly changing props from its parents, memoizing it saves
+// rendering time during parent component updates.
+export default React.memo(Header);

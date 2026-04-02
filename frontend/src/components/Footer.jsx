@@ -213,4 +213,9 @@ const Footer = () => {
   );
 };
 
-export default Footer;
+// ⚡ Bolt Performance Optimization:
+// Wrap the Footer component in React.memo() to prevent unnecessary re-renders.
+// The Footer primarily displays static links, social icons, and a newsletter form.
+// By memoizing it, we ensure that state updates higher in the tree (like page scrolling
+// or other form interactions) do not trigger expensive re-renders of this component.
+export default React.memo(Footer);
