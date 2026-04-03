@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, Mail, Phone, MapPin, Facebook, Instagram, Twitter, Music, Youtube } from 'lucide-react';
+import { Home, Mail, Phone, MapPin, Facebook, Instagram, Twitter, Music, Youtube, Loader2 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { useToast } from '../hooks/use-toast';
@@ -76,7 +76,14 @@ const Footer = () => {
               style={{ backgroundColor: '#C4D600', color: '#000' }}
               className="font-bold"
             >
-              {loading ? 'Subscribing...' : 'Subscribe'}
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Subscribing...
+                </>
+              ) : (
+                'Subscribe'
+              )}
             </Button>
           </form>
         </div>
