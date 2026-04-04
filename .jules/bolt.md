@@ -1,3 +1,5 @@
 ## 2024-05-18 - [Add lazy loading to React images]
 **Learning:** Adding `loading="lazy"` to images below the fold saves initial bandwidth and improves load time on image-heavy React pages. The `fetchpriority="high"` and `loading="eager"` can be used on the hero/LCP image above the fold for maximum speed.
-**Action:** Always add `loading="lazy"` for unoptimized remote images that are not immediately visible on page load.
+**Action:** Always add `loading="lazy"` for unoptimized remote images that are not immediately visible on page load.## 2024-05-19 - [Add DB Indexes for Sorting and Upserts]
+**Learning:** In MongoDB, sorting fields (like `created_at` or `subscribed_at`) without an index leads to inefficient collection scans and in-memory sorts, causing performance bottlenecks on large datasets. Additionally, fields used in `find_one_and_update` with `upsert=True` (like `email` in newsletter subscriptions) benefit significantly from a unique index.
+**Action:** Always create compound or single-field descending indexes (`pymongo.DESCENDING`) for fields commonly used in `.sort()` operations, and unique ascending indexes (`pymongo.ASCENDING`) for fields used as lookup keys in upsert operations to guarantee speed and data integrity.
