@@ -18,6 +18,11 @@ from starlette.requests import Request
 # Create the main app without a prefix
 app = FastAPI(title="Likha Home Builders API", version="1.0.0")
 
+from fastapi.middleware.gzip import GZipMiddleware
+
+# Add GZip compression middleware (optimized for payloads > 500 bytes)
+app.add_middleware(GZipMiddleware, minimum_size=500)
+
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         response = await call_next(request)
@@ -25,6 +30,13 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+
+        # Apply anti-caching headers specifically to API routes to prevent sensitive data leakage
+        if request.url.path.startswith("/api/"):
+            response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+            response.headers["Pragma"] = "no-cache"
+            response.headers["Expires"] = "0"
+
         return response
 
 app.add_middleware(SecurityHeadersMiddleware)
