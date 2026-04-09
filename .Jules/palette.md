@@ -21,3 +21,7 @@
 ## 2024-05-28 - Custom Interactive Element Focus States
 **Learning:** Standard browsers may obscure or completely remove default focus states when custom styles (like background colors, border radii, or complex layouts) are applied to interactive elements (e.g., icon-only social media links). Without a visual focus indicator, these elements become inaccessible to keyboard users navigating the site.
 **Action:** Always explicitly apply high-contrast focus indicators using Tailwind classes (e.g., `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C4D600] focus-visible:ring-offset-2 focus-visible:ring-offset-black`) to guarantee keyboard accessibility on custom-styled interactive elements.
+
+## 2024-05-29 - Keyboard Interaction for Complex Custom Interactive Elements
+**Learning:** The custom 3D image carousel relied solely on `onClick` handlers attached to `div` elements, making the primary interactive feature of the page completely inaccessible to keyboard users. Just adding visual focus indicators is not enough if the element cannot receive focus or respond to keyboard events.
+**Action:** When creating complex custom interactive components using non-semantic elements like `div`, explicitly add `role="button"`, dynamic `tabIndex` (e.g. `tabIndex={isFocusable ? 0 : -1}` to prevent focusing off-screen elements), explicit `aria-label` or `aria-labelledby`, and `onKeyDown` handlers for at least `Enter` and `Space` keys to mimic native interactive behavior.

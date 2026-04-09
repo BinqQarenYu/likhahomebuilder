@@ -242,10 +242,15 @@ const ImageCarousel = React.memo(({ images }) => {
             cursor: isDragging ? 'grabbing' : 'grab'
           }}
         >
-          {images.map((img, i) => (
+          {images.map((img, i) => {
+            const diffCalc = (i - currentIndex + imagesCount) % imagesCount;
+            const distanceCalc = diffCalc > imagesCount / 2 ? diffCalc - imagesCount : diffCalc;
+            const absDiffCalc = Math.abs(distanceCalc);
+
+            return (
             <div
               key={i}
-              className="absolute inset-0 w-full h-full rounded-2xl overflow-hidden border border-white/10"
+              className={`absolute inset-0 w-full h-full rounded-2xl overflow-hidden border border-white/10 ${absDiffCalc <= 2 ? 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#C4D600] focus-visible:ring-offset-2 focus-visible:ring-offset-black' : ''}`}
               style={getImageStyles(i)}
               onMouseEnter={() => setHoveredIndex(i)}
               onMouseMove={(e) => handleFrameMouseMove(e, i)}
@@ -254,17 +259,29 @@ const ImageCarousel = React.memo(({ images }) => {
                 setMouseY(0);
               }}
               onClick={() => {
-                const diff = (i - currentIndex + imagesCount) % imagesCount;
-                const distance = diff > imagesCount / 2 ? diff - imagesCount : diff;
-
                 // If already centered, open lightbox
-                if (distance === 0) {
+                if (distanceCalc === 0) {
                   setLightboxIndex(i);
                   setLightboxOpen(true);
                 } else {
                   // If not centered, move to this image first
                   setTransitionDuration(500);
                   setCurrentIndex(i);
+                }
+              }}
+              role="button"
+              tabIndex={absDiffCalc <= 2 ? 0 : -1}
+              aria-label={distanceCalc === 0 ? `View high resolution image ${i + 1}` : `Bring image ${i + 1} to front`}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  if (distanceCalc === 0) {
+                    setLightboxIndex(i);
+                    setLightboxOpen(true);
+                  } else {
+                    setTransitionDuration(500);
+                    setCurrentIndex(i);
+                  }
                 }
               }}
             >
@@ -278,7 +295,7 @@ const ImageCarousel = React.memo(({ images }) => {
                 onError={handleImageError}
               />
             </div>
-          ))}
+          )})}
         </div>
 
         {/* Modern Controls */}
