@@ -6,10 +6,15 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 import os
 import logging
+import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+from fastapi import APIRouter, FastAPI
+from fastapi.staticfiles import StaticFiles
 # Import routes
 from routes import contact, newsletter, purchase
+from starlette.middleware.cors import CORSMiddleware
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
