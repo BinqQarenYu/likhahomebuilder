@@ -23,7 +23,10 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 
 # Create the main app without a prefix
-app = FastAPI(title="Likha Home Builders API", version="1.0.0")
+app = FastAPI(title="Likha Home Builders API", version="1.0.0", lifespan=lifespan)
+
+# Add GZip compression middleware (optimized for payloads > 500 bytes)
+app.add_middleware(GZipMiddleware, minimum_size=500)
 
 from collections import defaultdict
 import time
@@ -103,7 +106,6 @@ api_router.include_router(purchase.router)
 # Include the router in the main app
 app.include_router(api_router)
 
-from starlette.responses import Response
 
 
 class CachedStaticFiles(StaticFiles):
