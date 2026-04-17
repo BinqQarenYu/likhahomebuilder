@@ -28,6 +28,7 @@ import Footer from '../components/Footer';
 const ImageCarousel = React.memo(({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [mouseY, setMouseY] = useState(0);
 
@@ -58,13 +59,13 @@ const ImageCarousel = React.memo(({ images }) => {
 
   // Auto-play Logic (4 seconds)
   React.useEffect(() => {
-    if (isHovered || isDragging || lightboxOpen) return;
+    if (isHovered || isFocused || isDragging || lightboxOpen) return;
     const interval = setInterval(() => {
       setTransitionDuration(600);
       handleNext();
     }, 4000);
     return () => clearInterval(interval);
-  }, [currentIndex, isHovered, isDragging, lightboxOpen]);
+  }, [currentIndex, isHovered, isFocused, isDragging, lightboxOpen]);
 
   const handleStart = (clientX) => {
     setDragStart(clientX);
@@ -230,6 +231,8 @@ const ImageCarousel = React.memo(({ images }) => {
           setHoveredIndex(null);
           setMouseY(0);
         }}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
@@ -286,7 +289,7 @@ const ImageCarousel = React.memo(({ images }) => {
           <div className="flex justify-center items-center gap-6 pointer-events-auto">
             <button
               onClick={() => handlePrev(1)}
-              className="p-3 bg-white/5 hover:bg-[#C4D600] text-white hover:text-black rounded-full transition-all border border-white/10 hover:border-[#C4D600] group"
+              className="p-3 bg-white/5 hover:bg-[#C4D600] text-white hover:text-black rounded-full transition-all border border-white/10 hover:border-[#C4D600] group focus-visible:ring-2 focus-visible:ring-[#C4D600] outline-none"
               aria-label="Previous"
             >
               <svg className="w-6 h-6 transform transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -312,7 +315,7 @@ const ImageCarousel = React.memo(({ images }) => {
 
             <button
               onClick={() => handleNext(1)}
-              className="p-3 bg-white/5 hover:bg-[#C4D600] text-white hover:text-black rounded-full transition-all border border-white/10 hover:border-[#C4D600] group"
+              className="p-3 bg-white/5 hover:bg-[#C4D600] text-white hover:text-black rounded-full transition-all border border-white/10 hover:border-[#C4D600] group focus-visible:ring-2 focus-visible:ring-[#C4D600] outline-none"
               aria-label="Next"
             >
               <svg className="w-6 h-6 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -334,7 +337,7 @@ const ImageCarousel = React.memo(({ images }) => {
           <div className="relative group w-full h-full flex items-center justify-center h-[70vh] md:h-[80vh] p-4">
             {/* Top Bar for Close Button - Ensure visibility */}
             <div className="absolute top-0 left-0 right-0 h-16 flex items-center justify-end px-6 z-[1100] pointer-events-none">
-              <DialogClose className="p-3 bg-white/10 hover:bg-[#C4D600] text-white hover:text-black rounded-full transition-all outline-none border border-white/20 pointer-events-auto backdrop-blur-md">
+              <DialogClose className="p-3 bg-white/10 hover:bg-[#C4D600] text-white hover:text-black rounded-full transition-all outline-none border border-white/20 pointer-events-auto backdrop-blur-md focus-visible:ring-2 focus-visible:ring-[#C4D600]">
                 <X className="w-6 h-6" />
                 <span className="sr-only">Close</span>
               </DialogClose>
@@ -342,7 +345,7 @@ const ImageCarousel = React.memo(({ images }) => {
 
             {/* Navigation Arrows */}
             <button
-              className="absolute left-6 text-white hover:text-[#C4D600] z-50 p-3 transition-colors bg-black/40 hover:bg-black/60 rounded-full backdrop-blur-sm border border-white/10"
+              className="absolute left-6 text-white hover:text-[#C4D600] z-50 p-3 transition-colors bg-black/40 hover:bg-black/60 rounded-full backdrop-blur-sm border border-white/10 focus-visible:ring-2 focus-visible:ring-[#C4D600] outline-none"
               onClick={(e) => {
                 e.stopPropagation();
                 setLightboxIndex((prev) => (prev - 1 + imagesCount) % imagesCount);
@@ -362,7 +365,7 @@ const ImageCarousel = React.memo(({ images }) => {
             />
 
             <button
-              className="absolute right-6 text-white hover:text-[#C4D600] z-50 p-3 transition-colors bg-black/40 hover:bg-black/60 rounded-full backdrop-blur-sm border border-white/10"
+              className="absolute right-6 text-white hover:text-[#C4D600] z-50 p-3 transition-colors bg-black/40 hover:bg-black/60 rounded-full backdrop-blur-sm border border-white/10 focus-visible:ring-2 focus-visible:ring-[#C4D600] outline-none"
               onClick={(e) => {
                 e.stopPropagation();
                 setLightboxIndex((prev) => (prev + 1) % imagesCount);
