@@ -5,3 +5,7 @@
 ## 2024-05-20 - [Optimize MongoDB with Indexes on Startup]
 **Learning:** Database queries that include sorting (e.g., `.sort("created_at", -1)`) result in O(n) collection scans if the relevant fields are not indexed. Adding unique indexes for fields like email also provides an extra layer of data integrity at the database level.
 **Action:** Ensure all frequently queried or sorted fields have appropriate indexes initialized during the application startup event.
+
+## 2024-05-22 - [Middleware Consolidation & Lifespan Optimization]
+**Learning:** Redundant middleware layers and inefficient global dictionary cleanups (e.g., in rate limiters) add unnecessary per-request overhead. Using the modern FastAPI `lifespan` handler ensures reliable startup tasks like DB indexing, while consolidating middleware logic reduces the number of request/response transformations. Throttling expensive O(N) cleanups in middlewares prevents CPU spikes during high-concurrency sensitive paths.
+**Action:** Audit middleware stacks for redundancy and consolidate where possible. Use throttled cleanup logic for global state trackers.
